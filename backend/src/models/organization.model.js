@@ -29,6 +29,11 @@ const orgSchema = new Schema(
       type: String,
       required: true,
     },
+    role: {
+      type: String,
+      enum: ['admin', 'manager', 'employee'],
+      default: 'admin',
+    },
     employeeDetails: {
       type: [Schema.Types.ObjectId],
       ref: 'Employee',
