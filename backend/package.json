@@ -1,0 +1,25 @@
+{
+  "name": "opertions-360-server",
+  "version": "1.0.0",
+  "description": "this is the server side support for operations-360",
+  "repository": {
+    "type": "git",
+    "url": "operations360"
+  },
+  "license": "ISC",
+  "author": "anujsamdariya07 && Shubham-806",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "mongoose": "^8.14.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
