@@ -4,6 +4,7 @@ const Organization = require('../models/organization.model');
 const Employee = require('../models/employee.model');
 const sendWelcomeEmail = require('../utils/sendWelcomeEmail');
 const createToken = require('../utils/createToken');
+const generateEmployeeId = require('../utils/generateEmployeeId');
 
 const signUp = async (req, res) => {
   try {
@@ -47,8 +48,11 @@ const signUp = async (req, res) => {
       existingEmployee = await Employee.findOne({ username });
     }
 
+    const employeeId = await generateEmployeeId(newOrganization._id.toString());
+
     const adminEmployee = await Employee.create({
       orgId: newOrganization._id.toString(),
+      id: employeeId,
       name,
       username,
       password: hashedPassword,
@@ -105,7 +109,7 @@ const signIn = async (req, res) => {
       });
     }
 
-    const token = createToken(employee._id); 
+    const token = createToken(employee._id);
 
     return res.status(200).json({
       message: 'Login successful!',

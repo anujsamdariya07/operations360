@@ -106,11 +106,9 @@ const updateItem = async (req, res) => {
     const { name, quantity, threshold, image, vendorName, cost } = req.body;
 
     if (!vendorName || cost == null) {
-      return res
-        .status(400)
-        .json({
-          message: 'vendorName and cost are required for updating history.',
-        });
+      return res.status(400).json({
+        message: 'vendorName and cost are required for updating history.',
+      });
     }
 
     const orgId = req.user.orgId;
