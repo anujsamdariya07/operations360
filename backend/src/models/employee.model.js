@@ -4,7 +4,7 @@ const { Schema, model, models } = mongoose;
 const employeeSchema = new Schema(
   {
     orgId: {
-      type: Number,
+      type: String,
       required: true,
     },
     name: {
@@ -24,6 +24,12 @@ const employeeSchema = new Schema(
     mustChangePassword: {
       type: Boolean,
       default: true,
+    },
+    role: {
+      type: String,
+      enum: ['admin', 'manager', 'employee'],
+      default: 'admin',
+      required: true,
     },
     mobileNo: {
       type: String,
