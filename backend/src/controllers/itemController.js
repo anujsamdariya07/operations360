@@ -3,7 +3,9 @@ const Item = require('../models/item.model');
 
 const getAllItems = async (req, res) => {
   try {
-    const items = await Item.find();
+    const orgId = req.user.orgId;
+
+    const items = await Item.find({ orgId });
 
     return res.status(200).json({
       message: 'Items fetched successfully.',
@@ -20,9 +22,10 @@ const getAllItems = async (req, res) => {
 
 const getItem = async (req, res) => {
   try {
+    const orgId = req.user.orgId;
     const { id } = req.params;
 
-    const item = await Item.findById(id);
+    const item = await Item.findOne({ id, orgId });
 
     if (!item) {
       return res.status(404).json({ message: 'Item not found.' });
