@@ -7,15 +7,16 @@ const {
   updateItem,
   deleteItem,
 } = require('../controllers/itemController');
+const isAuthenticated = require('../middlewares/isAuthenticated');
 
-router.get('/items', getAllItems);
+router.get('/items', isAuthenticated, getAllItems);
 
-router.get('/items/:id', getItem);
+router.get('/items/:id', isAuthenticated, getItem);
 
-router.post('/items', createItem);
+router.post('/items', isAuthenticated, createItem);
 
-router.put('/items/:id', updateItem);
+router.put('/items/:id', isAuthenticated, updateItem);
 
-router.delete('/items/:id', deleteItem);
+router.delete('/items/:id', isAuthenticated, deleteItem);
 
 module.exports = router;
