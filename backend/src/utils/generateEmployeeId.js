@@ -1,6 +1,6 @@
-import Employee from '../models/employee.model.js';
+const Employee = require('../models/employee.model.js');
 
-export const generateEmployeeId = async (orgId) => {
+const generateEmployeeId = async (orgId) => {
   const employees = await Employee.find({ orgId });
 
   const ids = employees
@@ -14,3 +14,5 @@ export const generateEmployeeId = async (orgId) => {
 
   return `Employee-${maxId + 1}`;
 };
+
+module.exports = generateEmployeeId;
