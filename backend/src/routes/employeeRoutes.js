@@ -7,17 +7,43 @@ const {
   deleteEmployee,
 } = require('../controllers/employeeController');
 const isAuthenticated = require('../middlewares/isAuthenticated');
+const authorizeRoles = require('../middlewares/authorizeRoles');
 
 const router = express.Router();
 
-router.get('/employees', isAuthenticated, getAllEmployees);
+router.get(
+  '/employees',
+  isAuthenticated,
+  authorizeRoles('admin', 'manager', 'employee'),
+  getAllEmployees
+);
 
-router.get('/employees/:id', isAuthenticated, getEmployee);
+router.get(
+  '/employees/:id',
+  isAuthenticated,
+  authorizeRoles('admin'),
+  getEmployee
+);
 
-router.post('/employees', isAuthenticated, createEmployee);
+router.post(
+  '/employees',
+  isAuthenticated,
+  authorizeRoles('admin'),
+  createEmployee
+);
 
-router.put('/employees/:id', isAuthenticated, updateEmployee);
+router.put(
+  '/employees/:id',
+  isAuthenticated,
+  authorizeRoles('admin'),
+  updateEmployee
+);
 
-router.delete('/employees/:id', isAuthenticated, deleteEmployee);
+router.delete(
+  '/employees/:id',
+  isAuthenticated,
+  authorizeRoles('admin'),
+  deleteEmployee
+);
 
 module.exports = router;
