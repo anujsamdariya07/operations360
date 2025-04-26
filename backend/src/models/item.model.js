@@ -44,7 +44,7 @@ const itemSchema = new Schema(
     threshold: {
       type: Number,
       required: true,
-      default: 10, // default low-stock threshold
+      default: 10,
     },
     lastDateOfUpdate: {
       type: Date,
