@@ -109,7 +109,7 @@ const signIn = async (req, res) => {
       });
     }
 
-    const token = createToken(employee._id);
+    const token = createToken(employee);
 
     return res.status(200).json({
       message: 'Login successful!',
