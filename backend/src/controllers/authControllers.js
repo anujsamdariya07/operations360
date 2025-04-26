@@ -52,7 +52,7 @@ const signUp = async (req, res) => {
       name,
       username,
       password: hashedPassword,
-      mustChangePassword: true,
+      mustChangePassword: false,
       role: 'admin',
       mobileNo,
       address,
