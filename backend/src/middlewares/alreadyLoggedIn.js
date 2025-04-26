@@ -11,7 +11,7 @@ const alreadyLoggedIn = (req, res, next) => {
 
       return res.status(302).json({
         message: 'You are already logged in.',
-        redirectUrl: '/dashboard', // you can customize this
+        redirectUrl: '/dashboard',
       });
     } catch (error) {
       return next();

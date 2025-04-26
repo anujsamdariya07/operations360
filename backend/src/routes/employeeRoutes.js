@@ -8,6 +8,11 @@ const {
 } = require('../controllers/employeeController');
 const isAuthenticated = require('../middlewares/isAuthenticated');
 const authorizeRoles = require('../middlewares/authorizeRoles');
+const validate = require('../middlewares/validator');
+const {
+  employeeSchema,
+  employeeUpdateSchema,
+} = require('../validators/employeeValidator');
 
 const router = express.Router();
 
@@ -29,6 +34,7 @@ router.post(
   '/employees',
   isAuthenticated,
   authorizeRoles('admin'),
+  validate(employeeSchema),
   createEmployee
 );
 
@@ -36,6 +42,7 @@ router.put(
   '/employees/:id',
   isAuthenticated,
   authorizeRoles('admin'),
+  validate(employeeUpdateSchema),
   updateEmployee
 );
 

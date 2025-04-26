@@ -9,6 +9,8 @@ const {
 } = require('../controllers/itemController');
 const isAuthenticated = require('../middlewares/isAuthenticated');
 const authorizeRoles = require('../middlewares/authorizeRoles');
+const validate = require('../middlewares/validator');
+const { itemSchema, itemUpdateSchema } = require('../validators/itemValidator');
 
 router.get(
   '/items',
@@ -28,6 +30,7 @@ router.post(
   '/items',
   isAuthenticated,
   authorizeRoles('admin', 'manager'),
+  validate(itemSchema),
   createItem
 );
 
@@ -35,6 +38,7 @@ router.put(
   '/items/:id',
   isAuthenticated,
   authorizeRoles('admin', 'manager'),
+  validate(itemUpdateSchema),
   updateItem
 );
 

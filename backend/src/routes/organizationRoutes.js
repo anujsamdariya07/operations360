@@ -6,6 +6,10 @@ const {
 } = require('../controllers/organizationController');
 const isAuthenticated = require('../middlewares/isAuthenticated');
 const authorizeRoles = require('../middlewares/authorizeRoles');
+const validate = require('../middlewares/validator');
+const {
+  organizationUpdateSchema,
+} = require('../validators/organizationValidator');
 
 const router = express.Router();
 
@@ -13,6 +17,7 @@ router.put(
   '/update-profile/:id',
   isAuthenticated,
   authorizeRoles('admin'),
+  validate(organizationUpdateSchema),
   updateOrganization
 );
 
