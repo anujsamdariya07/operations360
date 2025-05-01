@@ -45,9 +45,14 @@ const employeeSchema = new Schema(
     },
     attendance: {
       type: Number,
-      required: true,
       default: 0,
     },
+    messages: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Message',
+      },
+    ],
   },
   {
     timestamps: true,

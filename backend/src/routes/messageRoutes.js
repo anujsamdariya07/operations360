@@ -4,14 +4,17 @@ const {
   createMessage,
   getAllMessages,
   getMessageById,
+  getMessagesReceived,
   updateMessage,
   deleteMessage,
 } = require('../controllers/messageController');
+const isAuthenticated = require('../middlewares/isAuthenticated');
 
-router.post('/', createMessage);
-router.get('/', getAllMessages);
-router.get('/:id', getMessageById);
-router.put('/:id', updateMessage);
-router.delete('/:id', deleteMessage);
+router.get('/', isAuthenticated, getAllMessages);
+router.get('/received/:employeeId', isAuthenticated, getMessagesReceived);
+router.get('/:id', isAuthenticated, getMessageById);
+router.post('/', isAuthenticated, createMessage);
+router.put('/:id', isAuthenticated, updateMessage);
+router.delete('/:id', isAuthenticated, deleteMessage);
 
 module.exports = router;

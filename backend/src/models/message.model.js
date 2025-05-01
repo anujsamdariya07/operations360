@@ -3,14 +3,12 @@ const { Schema, model, models } = mongoose;
 
 const messageSchema = new Schema(
   {
-    sender: {
-      type: Schema.Types.ObjectId,
-      ref: 'Employee', 
+    senderId: {
+      type: String,
       required: true,
     },
-    receiver: {
-      type: Schema.Types.ObjectId,
-      ref: 'Employee', 
+    receiverId: {
+      type: String,
       required: true,
     },
     orgId: {
@@ -21,14 +19,6 @@ const messageSchema = new Schema(
     content: {
       type: String,
       required: true,
-    },
-    type: {
-      type: String,
-      enum: ['text', 'image', 'file', 'system'],
-      default: 'text',
-    },
-    attachmentUrl: {
-      type: String, 
     },
     isRead: {
       type: Boolean,

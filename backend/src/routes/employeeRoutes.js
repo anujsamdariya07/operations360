@@ -34,7 +34,7 @@ router.post(
   '/employees',
   isAuthenticated,
   authorizeRoles('admin'),
-  validate(employeeSchema),
+  validate(employeeUpdateSchema),
   createEmployee
 );
 
