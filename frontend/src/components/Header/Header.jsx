@@ -12,7 +12,9 @@ const Header = () => {
       style={{ backgroundColor: '#222222' }}
     >
       <div className='flex items-center gap-2'>
+        <Link to={'/'}>
         <img src={logo} alt='Logo' className='h-10 w-auto' />
+        </Link>
       </div>
 
       <div className='flex items-center gap-4'>
