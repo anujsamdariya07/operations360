@@ -1,5 +1,7 @@
 const cloudinary = require('cloudinary');
 const Item = require('../models/item.model');
+const Employee = require('../models/employee.model');
+const Message = require('../models/message.model');
 
 const getAllItems = async (req, res) => {
   try {
@@ -103,6 +105,63 @@ const createItem = async (req, res) => {
   }
 };
 
+// const updateItem = async (req, res) => {
+//   try {
+//     const { id: itemId } = req.params;
+//     const { name, quantity, threshold, image, vendorName, cost } = req.body;
+
+//     if (!vendorName || cost == null) {
+//       return res.status(400).json({
+//         message: 'vendorName and cost are required for updating history.',
+//       });
+//     }
+
+//     const orgId = req.user.orgId;
+
+//     if (!orgId) {
+//       return res
+//         .status(403)
+//         .json({ message: 'Unauthorized. Organization ID missing.' });
+//     }
+
+//     const item = await Item.findOne({ _id: itemId, orgId });
+
+//     if (!item) {
+//       return res.status(404).json({ message: 'Item not found.' });
+//     }
+
+//     let imageUrl = item.image;
+//     if (image) {
+//       const uploadResponse = await cloudinary.uploader.upload(image);
+//       imageUrl = uploadResponse.secure_url;
+//     }
+
+//     const quantityUpdated = quantity - item.quantity;
+
+//     item.name = name || item.name;
+//     item.quantity = quantity ?? item.quantity;
+//     item.threshold = threshold ?? item.threshold;
+//     item.image = imageUrl;
+//     item.updateHistory.push({
+//       vendorName,
+//       quantityUpdated,
+//       cost,
+//     });
+
+//     await item.save();
+
+//     return res.status(200).json({
+//       message: 'Item updated successfully.',
+//       item,
+//     });
+//   } catch (error) {
+//     console.error('Update Item Error:', error);
+//     return res
+//       .status(500)
+//       .json({ message: 'Server error. Please try again later.' });
+//   }
+// };
+
 const updateItem = async (req, res) => {
   try {
     const { id: itemId } = req.params;
@@ -147,6 +206,23 @@ const updateItem = async (req, res) => {
     });
 
     await item.save();
+
+    // For low stock
+    if (item.quantity < item.threshold) {
+      const orgEmployees = await Employee.find({ orgId });
+
+      const admin = orgEmployees.find((emp) => emp.role === 'admin');
+      const manager = orgEmployees.find((emp) => emp.role === 'manager');
+
+      if (admin && manager) {
+        await Message.create({
+          senderId: admin.id,
+          receiverId: manager.id,
+          orgId,
+          content: `⚠️ Alert: Item "${item.name}" quantity (${item.quantity}) is below threshold (${item.threshold}).`,
+        });
+      }
+    }
 
     return res.status(200).json({
       message: 'Item updated successfully.',
