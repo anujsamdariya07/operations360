@@ -13,8 +13,7 @@ const orderRoutes = require('./routes/orderRoutes');
 const customerRoutes = require('./routes/customerRoutes');
 
 const cookieParser = require('cookie-parser');
-const cors = require('cors')
-
+const cors = require('cors');
 
 dbConnect();
 
