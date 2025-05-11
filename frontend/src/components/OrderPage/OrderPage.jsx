@@ -489,7 +489,7 @@ const OrderPage = () => {
       {/* Header */}
       <div className='flex flex-col md:flex-row items-start md:items-center justify-between gap-4'>
         <div className='flex items-center gap-3'>
-          <Link to={'/orders'}>
+          <Link to={'/orders/neworder'}>
             <button className='btn btn-sm btn-outline'>
               <ArrowLeft className='h-4 w-4' />
             </button>

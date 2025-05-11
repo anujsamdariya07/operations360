@@ -11,6 +11,7 @@ import SignUp from './SignUp/SignUp';
 import OrderPage from './OrderPage/OrderPage';
 import CustomerPage from './CustomerPage/CustomerPage';
 import NewCustomer from './NewCustomer/NewCustomer';
+import NewOrder from './NewOrder/NewOrder';
 
 export {
   Header,
@@ -26,4 +27,5 @@ export {
   OrderPage,
   CustomerPage,
   NewCustomer,
+  NewOrder,
 };

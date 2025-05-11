@@ -14,6 +14,7 @@ import {
   Home,
   Items,
   NewCustomer,
+  NewOrder,
   OrderPage,
   Orders,
   SignIn,
@@ -48,6 +49,10 @@ function App() {
         <Route
           path='orders/:orderId'
           element={!authUser ? <OrderPage /> : <Navigate to={'/sign-in'} />}
+        />
+        <Route
+          path='orders/new'
+          element={!authUser ? <NewOrder /> : <Navigate to={'/sign-in'} />}
         />
         <Route
           path='customers'
