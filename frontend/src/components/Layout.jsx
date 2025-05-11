@@ -3,7 +3,6 @@ import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar/Sidebar';
 import Header from './Header/Header';
 import Footer from './Footer/Footer';
-import { Menu } from 'lucide-react';
 
 const Layout = () => {
   const location = useLocation();
@@ -12,33 +11,30 @@ const Layout = () => {
   const hideLayoutRoutes = ['/', '/sign-in', '/sign-up'];
   const shouldHideLayout = hideLayoutRoutes.includes(location.pathname);
 
+  if (shouldHideLayout) {
+    return <Outlet />;
+  }
+
   return (
-    <div className="flex flex-col bg-[#222222] min-h-screen">
-      {!shouldHideLayout && (
-        <Header>
-          {/* Hamburger inside header */}
-          <button
-            className="text-[#ff851b] bg-[#2d2d2d] p-2 rounded-md ml-2"
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-          >
-            <Menu size={24} />
-          </button>
-        </Header>
-      )}
+    <div className='flex flex-col min-h-screen bg-[#222222]'>
+      {/* Header */}
+      <Header />
 
-      <div className="flex-1 flex flex-col md:flex-row transition-all">
-        {/* Sidebar within content area, not above header/footer */}
-        {!shouldHideLayout && (
+      {/* Main section: Sidebar + scrollable content */}
+      <div className='flex flex-1'>
+        {/* Fixed-height Sidebar */}
+        <div className='hidden md:block w-64 h-screen sticky top-0'>
           <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
-        )}
+        </div>
 
-        {/* Page Content */}
-        <main className="flex-1 p-4">
-          <Outlet />
-        </main>
+        {/* Scrollable content area with Footer at the bottom */}
+        <div className='flex-1 flex flex-col'>
+          <div className='flex-1 overflow-y-auto p-4'>
+            <Outlet />
+          </div>
+          <Footer />
+        </div>
       </div>
-
-      {!shouldHideLayout && <Footer />}
     </div>
   );
 };

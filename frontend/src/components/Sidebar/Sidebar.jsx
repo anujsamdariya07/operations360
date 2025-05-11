@@ -24,8 +24,8 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
     <>
       {/* Overlay Dropdown (when sidebar is open on small screens) */}
       {isOpen && (
-        <div className="fixed top-16 left-4 right-4 z-30 md:hidden bg-[#1a1a1a] border border-[#ff851b]/20 rounded-lg p-4 shadow-xl">
-          <nav className="space-y-3">
+        <div className='fixed top-16 left-4 right-4 z-30 md:hidden bg-[#1a1a1a] border border-[#ff851b]/20 rounded-lg p-4 shadow-xl'>
+          <nav className='space-y-3'>
             {navItems.map(({ name, icon: Icon, path }) => (
               <NavLink
                 key={name}
@@ -50,7 +50,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
               logout();
               setIsOpen(false);
             }}
-            className="mt-6 flex items-center gap-3 text-red-400 hover:text-red-300 px-3 py-2 rounded-md transition"
+            className='mt-6 flex items-center gap-3 text-red-400 hover:text-red-300 px-3 py-2 rounded-md transition'
           >
             <LogOut size={18} />
             <span>Logout</span>
@@ -60,14 +60,14 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
 
       {/* Permanent Sidebar on Desktop */}
       <div
-        className={`hidden md:flex md:w-64 flex-col justify-between bg-[#1a1a1a] border-r border-[#ff851b]/20 p-6`}
+        className={`hidden md:flex md:w-64 flex-col justify-between bg-[#1a1a1a] border-r border-[#ff851b]/20 p-6 h-screen sticky`}
       >
         <div>
-          <h2 className="text-2xl font-bold text-[#ff851b] mb-8 tracking-wide">
+          <h2 className='text-2xl font-bold text-[#ff851b] mb-8 tracking-wide'>
             Ops Manager
           </h2>
 
-          <nav className="space-y-4">
+          <nav className='space-y-4'>
             {navItems.map(({ name, icon: Icon, path }) => (
               <NavLink
                 key={name}
@@ -88,13 +88,13 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
           </nav>
         </div>
 
-        <div className="pt-8">
+        <div className='pt-8'>
           <button
             onClick={() => {
               logout();
               setIsOpen(false);
             }}
-            className="flex items-center gap-3 text-red-400 hover:text-red-300 px-3 py-2 rounded-md transition"
+            className='flex items-center gap-3 text-red-400 hover:text-red-300 px-3 py-2 rounded-md transition'
           >
             <LogOut size={20} />
             <span>Logout</span>
