@@ -7,6 +7,7 @@ import {
   ArrowUpDown,
   Calendar,
   Clock,
+  Funnel,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -204,13 +205,13 @@ const Orders = () => {
           <h1 className='text-3xl font-bold text-[#ff851b]'>Orders</h1>
           <p className='text-gray-400'>Manage and track customer orders</p>
         </div>
-        <a
-          href='/dashboard/orders/new'
+        <Link
+          href='/orders/new'
           className='inline-flex items-center bg-[#ff851b] text-white px-4 py-2 rounded hover:bg-[#ff571d]'
         >
           <Plus className='w-4 h-4 mr-2' />
           New Order
-        </a>
+        </Link>
       </div>
 
       <div className='flex flex-col md:flex-row gap-4'>
@@ -224,15 +225,15 @@ const Orders = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <button className='border rounded px-3 py-2 flex items-center justify-center bg-[#2d2d2d] hover:bg-[#ff851b]'>
-          <Filter className='w-4 h-4 text-[#ff851b]' />
+        <button className='px-4 py-2 border border-[#ff851b] text-[#ff851b] rounded-md font-medium transition duration-200 hover:bg-[#ff851b] hover:text-white shadow-md flex gap-1 justify-between items-center'>
+          <Funnel className='w-4 h-4' />
         </button>
         <button
           onClick={() => copyOrderLink(filteredCurrentOrders[0]?.id || '')}
-          className='border rounded px-3 py-2 flex items-center justify-center bg-[#2d2d2d] hover:bg-[#ff851b]'
+          className='px-4 py-2 border border-[#ff851b] text-[#ff851b] rounded-md font-medium transition duration-200 hover:bg-[#ff851b] hover:text-white shadow-md flex gap-1 justify-between items-center'
           title='Copy current page URL'
         >
-          <Copy className='w-4 h-4 text-[#ff851b]' />
+          <Copy className='w-4 h-4' />
         </button>
       </div>
 
@@ -266,7 +267,7 @@ const Orders = () => {
                 <h2 className='text-xl font-semibold text-[#ff851b]'>
                   Current Orders
                 </h2>
-                <button className='text-sm border rounded px-3 py-1 flex items-center text-[#ff851b]'>
+                <button className='px-4 py-2 border border-[#ff851b] text-[#ff851b] rounded-md font-medium transition duration-200 hover:bg-[#ff851b] hover:text-white shadow-md flex gap-1 justify-between items-center'>
                   <ArrowUpDown
                     className='w-4 h-4 mr-1
 '

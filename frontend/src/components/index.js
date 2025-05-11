@@ -9,6 +9,8 @@ import Orders from './Orders/Orders';
 import SignIn from './SignIn/SignIn';
 import SignUp from './SignUp/SignUp';
 import OrderPage from './OrderPage/OrderPage';
+import CustomerPage from './CustomerPage/CustomerPage';
+import NewCustomer from './NewCustomer/NewCustomer';
 
 export {
   Header,
@@ -22,4 +24,6 @@ export {
   SignIn,
   SignUp,
   OrderPage,
+  CustomerPage,
+  NewCustomer,
 };

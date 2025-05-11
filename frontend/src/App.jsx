@@ -7,11 +7,13 @@ import {
 } from 'react-router-dom';
 import Layout from './components/Layout';
 import {
+  CustomerPage,
   Customers,
   Dashboard,
   Employees,
   Home,
   Items,
+  NewCustomer,
   OrderPage,
   Orders,
   SignIn,
@@ -45,12 +47,19 @@ function App() {
         />
         <Route
           path='orders/:orderId'
-          // element={!authUser ? <OrderPage /> : <Navigate to={'/sign-in'} />}
-          element={<OrderPage />}
+          element={!authUser ? <OrderPage /> : <Navigate to={'/sign-in'} />}
         />
         <Route
           path='customers'
           element={!authUser ? <Customers /> : <Navigate to={'/sign-in'} />}
+        />
+        <Route
+          path='customers/:customerId'
+          element={!authUser ? <CustomerPage /> : <Navigate to={'/sign-in'} />}
+        />
+        <Route
+          path='customers/new'
+          element={!authUser ? <NewCustomer /> : <Navigate to={'/sign-in'} />}
         />
         <Route
           path='employees'

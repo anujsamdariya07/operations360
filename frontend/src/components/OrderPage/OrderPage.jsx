@@ -12,6 +12,371 @@ import {
 } from 'lucide-react';
 import { useBillStore } from '../../store/useBillStore';
 
+const currentOrders = {
+  'ORD-7892': {
+    id: 'ORD-7892',
+    name: 'Packaging Materials Order',
+    customer: 'Acme Corp',
+    customerDetails: {
+      name: 'Acme Corporation',
+      address: '123 Business Park, Mumbai, Maharashtra 400001',
+      phone: '+91 9876543210',
+      email: 'orders@acmecorp.com',
+      gstNo: '27AABCU9603R1ZX',
+    },
+    status: 'Processing',
+    deadline: '2025-04-25',
+    createdAt: '2025-04-10',
+    products: [
+      {
+        id: 'PROD-001',
+        name: 'Box Type A',
+        quantity: 10,
+        rate: 50,
+        available: 30,
+      },
+      {
+        id: 'PROD-002',
+        name: 'Packaging Tape',
+        quantity: 5,
+        rate: 40,
+        available: 10,
+      },
+    ],
+    advance: '₹1,000.00',
+    description: 'Packaging for Q2 production.',
+    totalAmount: '₹1,200.00',
+    amountPaid: '₹1,000.00',
+    amountRemaining: '₹200.00',
+    paymentMode: 'UPI',
+    payments: [
+      { id: 'PAY-001', date: '2025-04-10', amount: '₹1,000.00', mode: 'UPI' },
+    ],
+  },
+
+  'ORD-7891': {
+    id: 'ORD-7891',
+    name: 'Tech Component Order',
+    customer: 'TechGiant Inc',
+    customerDetails: {
+      name: 'TechGiant Inc.',
+      address: '456 Innovation Lane, Bengaluru, KA 560001',
+      phone: '+91 9123456780',
+      email: 'procure@techgiant.com',
+      gstNo: '29ABCDE1234F2Z5',
+    },
+    status: 'Ready',
+    deadline: '2025-04-22',
+    createdAt: '2025-04-05',
+    products: [
+      {
+        id: 'PROD-005',
+        name: 'Circuit Board',
+        quantity: 30,
+        rate: 100,
+        available: 100,
+      },
+      {
+        id: 'PROD-007',
+        name: 'Heat Sink',
+        quantity: 15,
+        rate: 90,
+        available: 50,
+      },
+    ],
+    advance: '₹1,000.00',
+    description: 'Components for device batch A7.',
+    totalAmount: '₹3,450.00',
+    amountPaid: '₹1,000.00',
+    amountRemaining: '₹2,450.00',
+    paymentMode: 'Bank Transfer',
+    payments: [
+      {
+        id: 'PAY-002',
+        date: '2025-04-05',
+        amount: '₹1,000.00',
+        mode: 'Bank Transfer',
+      },
+    ],
+  },
+
+  'ORD-7890': {
+    id: 'ORD-7890',
+    name: 'Safety Kit Order',
+    customer: 'Global Supplies',
+    customerDetails: {
+      name: 'Global Supplies Pvt Ltd',
+      address: '12 Export Nagar, Delhi 110001',
+      phone: '+91 9988776655',
+      email: 'safety@globalsupplies.com',
+      gstNo: '07GHJKL7890P1Z6',
+    },
+    status: 'In Production',
+    deadline: '2025-04-30',
+    createdAt: '2025-04-12',
+    products: [
+      {
+        id: 'PROD-011',
+        name: 'Safety Gloves',
+        quantity: 20,
+        rate: 20,
+        available: 100,
+      },
+      {
+        id: 'PROD-012',
+        name: 'Helmets',
+        quantity: 5,
+        rate: 98.1,
+        available: 50,
+      },
+    ],
+    advance: '₹300.00',
+    description: 'Safety kits for construction team.',
+    totalAmount: '₹890.50',
+    amountPaid: '₹300.00',
+    amountRemaining: '₹590.50',
+    paymentMode: 'Cash',
+    payments: [
+      { id: 'PAY-003', date: '2025-04-12', amount: '₹300.00', mode: 'Cash' },
+    ],
+  },
+
+  'ORD-7889': {
+    id: 'ORD-7889',
+    name: 'Packaging Order - Local',
+    customer: 'Local Manufacturing',
+    customerDetails: {
+      name: 'Local Manufacturing Co.',
+      address: '88 Industrial Area, Pune, MH 411001',
+      phone: '+91 9090909090',
+      email: 'local@manufacturing.in',
+      gstNo: '27LMNOP3456Z1Z1',
+    },
+    status: 'Shipped',
+    deadline: '2025-04-20',
+    createdAt: '2025-04-01',
+    products: [
+      {
+        id: 'PROD-021',
+        name: 'Corrugated Sheets',
+        quantity: 30,
+        rate: 70,
+        available: 60,
+      },
+    ],
+    advance: '₹1,000.00',
+    description: 'Urgent packaging order.',
+    totalAmount: '₹2,100.00',
+    amountPaid: '₹1,000.00',
+    amountRemaining: '₹1,100.00',
+    paymentMode: 'Cheque',
+    payments: [
+      {
+        id: 'PAY-004',
+        date: '2025-04-01',
+        amount: '₹1,000.00',
+        mode: 'Cheque',
+      },
+    ],
+  },
+
+  'ORD-7888': {
+    id: 'ORD-7888',
+    name: 'Construction Supplies',
+    customer: 'City Builders',
+    customerDetails: {
+      name: 'City Builders Ltd',
+      address: '89 Builders Road, Chennai 600001',
+      phone: '+91 9876501234',
+      email: 'supply@citybuilders.com',
+      gstNo: '33ZXYC0987U1Z9',
+    },
+    status: 'Processing',
+    deadline: '2025-05-05',
+    createdAt: '2025-04-15',
+    products: [
+      {
+        id: 'PROD-030',
+        name: 'Steel Rods',
+        quantity: 20,
+        rate: 150,
+        available: 40,
+      },
+      {
+        id: 'PROD-031',
+        name: 'Concrete Bags',
+        quantity: 10,
+        rate: 300,
+        available: 20,
+      },
+    ],
+    advance: '₹2,500.00',
+    description: 'Supplies for site #14.',
+    totalAmount: '₹4,500.00',
+    amountPaid: '₹2,500.00',
+    amountRemaining: '₹2,000.00',
+    paymentMode: 'Bank Transfer',
+    payments: [
+      {
+        id: 'PAY-005',
+        date: '2025-04-15',
+        amount: '₹2,500.00',
+        mode: 'Bank Transfer',
+      },
+    ],
+  },
+};
+
+const previousOrders = {
+  'ORD-7850': {
+    id: 'ORD-7850',
+    name: 'Bulk Cartons',
+    customer: 'Acme Corp',
+    customerDetails: {
+      name: 'Acme Corporation',
+      address: '123 Business Park, Mumbai, Maharashtra 400001',
+      phone: '+91 9876543210',
+      email: 'orders@acmecorp.com',
+      gstNo: '27AABCU9603R1ZX',
+    },
+    status: 'Completed',
+    deadline: '2025-04-10',
+    createdAt: '2025-03-28',
+    products: [
+      { id: 'PROD-041', name: 'Carton Boxes', quantity: 50, rate: 46 },
+    ],
+    advance: '₹2,300.00',
+    description: 'Monthly carton supply.',
+    totalAmount: '₹2,300.00',
+    amountPaid: '₹2,300.00',
+    amountRemaining: '₹0.00',
+    paymentMode: 'Bank Transfer',
+    payments: [
+      {
+        id: 'PAY-006',
+        date: '2025-03-28',
+        amount: '₹2,300.00',
+        mode: 'Bank Transfer',
+      },
+    ],
+  },
+
+  'ORD-7842': {
+    id: 'ORD-7842',
+    name: 'Component Delivery',
+    customer: 'TechGiant Inc',
+    customerDetails: {
+      name: 'TechGiant Inc.',
+      address: '456 Innovation Lane, Bengaluru, KA 560001',
+      phone: '+91 9123456780',
+      email: 'procure@techgiant.com',
+      gstNo: '29ABCDE1234F2Z5',
+    },
+    status: 'Completed',
+    deadline: '2025-04-05',
+    createdAt: '2025-03-20',
+    products: [{ id: 'PROD-050', name: 'Chip Set X1', quantity: 25, rate: 70 }],
+    advance: '₹1,750.00',
+    description: 'Delivery of chipsets for Q1.',
+    totalAmount: '₹1,750.00',
+    amountPaid: '₹1,750.00',
+    amountRemaining: '₹0.00',
+    paymentMode: 'UPI',
+    payments: [
+      { id: 'PAY-007', date: '2025-03-20', amount: '₹1,750.00', mode: 'UPI' },
+    ],
+  },
+
+  'ORD-7835': {
+    id: 'ORD-7835',
+    name: 'Safety Delivery',
+    customer: 'Global Supplies',
+    customerDetails: {
+      name: 'Global Supplies Pvt Ltd',
+      address: '12 Export Nagar, Delhi 110001',
+      phone: '+91 9988776655',
+      email: 'safety@globalsupplies.com',
+      gstNo: '07GHJKL7890P1Z6',
+    },
+    status: 'Completed',
+    deadline: '2025-03-28',
+    createdAt: '2025-03-10',
+    products: [
+      { id: 'PROD-060', name: 'Safety Goggles', quantity: 20, rate: 40 },
+      { id: 'PROD-061', name: 'Face Shields', quantity: 10, rate: 89.05 },
+    ],
+    advance: '₹3,290.50',
+    description: 'Safety materials for plant.',
+    totalAmount: '₹3,290.50',
+    amountPaid: '₹3,290.50',
+    amountRemaining: '₹0.00',
+    paymentMode: 'Cash',
+    payments: [
+      { id: 'PAY-008', date: '2025-03-10', amount: '₹3,290.50', mode: 'Cash' },
+    ],
+  },
+
+  'ORD-7830': {
+    id: 'ORD-7830',
+    name: 'Local Boxes',
+    customer: 'Local Manufacturing',
+    customerDetails: {
+      name: 'Local Manufacturing Co.',
+      address: '88 Industrial Area, Pune, MH 411001',
+      phone: '+91 9090909090',
+      email: 'local@manufacturing.in',
+      gstNo: '27LMNOP3456Z1Z1',
+    },
+    status: 'Completed',
+    deadline: '2025-03-22',
+    createdAt: '2025-03-01',
+    products: [{ id: 'PROD-071', name: 'Box Type B', quantity: 30, rate: 60 }],
+    advance: '₹1,800.00',
+    description: 'End of quarter shipment.',
+    totalAmount: '₹1,800.00',
+    amountPaid: '₹1,800.00',
+    amountRemaining: '₹0.00',
+    paymentMode: 'UPI',
+    payments: [
+      { id: 'PAY-009', date: '2025-03-01', amount: '₹1,800.00', mode: 'UPI' },
+    ],
+  },
+
+  'ORD-7825': {
+    id: 'ORD-7825',
+    name: 'Heavy Supplies',
+    customer: 'City Builders',
+    customerDetails: {
+      name: 'City Builders Ltd',
+      address: '89 Builders Road, Chennai 600001',
+      phone: '+91 9876501234',
+      email: 'supply@citybuilders.com',
+      gstNo: '33ZXYC0987U1Z9',
+    },
+    status: 'Completed',
+    deadline: '2025-03-15',
+    createdAt: '2025-02-25',
+    products: [
+      { id: 'PROD-081', name: 'Concrete Mix', quantity: 10, rate: 400 },
+      { id: 'PROD-082', name: 'Bricks', quantity: 100, rate: 8 },
+    ],
+    advance: '₹5,200.00',
+    description: 'Bulk construction supplies.',
+    totalAmount: '₹5,200.00',
+    amountPaid: '₹5,200.00',
+    amountRemaining: '₹0.00',
+    paymentMode: 'Bank Transfer',
+    payments: [
+      {
+        id: 'PAY-010',
+        date: '2025-02-25',
+        amount: '₹5,200.00',
+        mode: 'Bank Transfer',
+      },
+    ],
+  },
+};
+
 const orderData = {
   'ORD-7892': {
     id: 'ORD-7892',
@@ -94,7 +459,9 @@ const copyOrderLink = (orderId) => {
 
 const OrderPage = () => {
   const { orderId } = useParams();
-  const order = orderData[orderId];
+  let order = currentOrders[orderId];
+
+  if (!order) order = previousOrders[orderId];
 
   const { generateBill, generating } = useBillStore();
 
@@ -160,9 +527,13 @@ const OrderPage = () => {
             <div className='flex items-center gap-4'>
               <span
                 className={`badge badge-lg ${
-                  order.status === 'Under Process'
+                  order.status === 'Processing'
                     ? 'badge-warning'
-                    : 'badge-success'
+                    : order.status === 'Shipped'
+                    ? 'badge-success'
+                    : order.status === 'In Production'
+                    ? 'badge-primary'
+                    : 'badge-info'
                 }`}
               >
                 {order.status}
