@@ -206,7 +206,7 @@ const Orders = () => {
           <p className='text-gray-400'>Manage and track customer orders</p>
         </div>
         <Link
-          href='/orders/new'
+          to={'/orders/new'}
           className='inline-flex items-center bg-[#ff851b] text-white px-4 py-2 rounded hover:bg-[#ff571d]'
         >
           <Plus className='w-4 h-4 mr-2' />
