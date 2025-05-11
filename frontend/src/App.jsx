@@ -12,6 +12,7 @@ import {
   Employees,
   Home,
   Items,
+  OrderPage,
   Orders,
   SignIn,
   SignUp,
@@ -41,6 +42,11 @@ function App() {
         <Route
           path='orders'
           element={!authUser ? <Orders /> : <Navigate to={'/sign-in'} />}
+        />
+        <Route
+          path='orders/:orderId'
+          // element={!authUser ? <OrderPage /> : <Navigate to={'/sign-in'} />}
+          element={<OrderPage />}
         />
         <Route
           path='customers'

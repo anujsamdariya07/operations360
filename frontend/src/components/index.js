@@ -8,6 +8,7 @@ import Items from './Items/Items';
 import Orders from './Orders/Orders';
 import SignIn from './SignIn/SignIn';
 import SignUp from './SignUp/SignUp';
+import OrderPage from './OrderPage/OrderPage';
 
 export {
   Header,
@@ -20,4 +21,5 @@ export {
   Orders,
   SignIn,
   SignUp,
+  OrderPage,
 };

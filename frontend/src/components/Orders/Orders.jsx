@@ -8,6 +8,7 @@ import {
   Calendar,
   Clock,
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Orders = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -160,12 +161,12 @@ const Orders = () => {
                 </td>
                 <td className='p-4'>{order.total}</td>
                 <td className='p-4 space-x-2'>
-                  <a
-                    href={`/dashboard/orders/${order.id}`}
+                  <Link
+                    to={`/orders/${order.id}`}
                     className='text-[#ff851b] underline text-sm'
                   >
                     Details
-                  </a>
+                  </Link>
                   {isCurrent && (
                     <a
                       href={`/dashboard/orders/${order.id}/edit`}

@@ -11,6 +11,7 @@ const employeeRoutes = require('./routes/employeeRoutes');
 const messageRoutes = require('./routes/messageRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const customerRoutes = require('./routes/customerRoutes');
+const billRoutes = require('./routes/billRoutes')
 
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
@@ -36,6 +37,7 @@ app.use('/api/customer', customerRoutes);
 app.use('/api/organization', organizationRoutes);
 app.use('/api/item', itemRoutes);
 app.use('/api/employee', employeeRoutes);
+app.use('/api/bills', billRoutes);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
