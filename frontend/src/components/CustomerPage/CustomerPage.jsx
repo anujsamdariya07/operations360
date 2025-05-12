@@ -38,54 +38,6 @@ const customerData = {
       },
     ],
   },
-  2: {
-    id: 2,
-    name: 'TechGiant Inc',
-    email: 'info@techgiant.com',
-    phone: '+91 9876543211',
-    location: 'San Francisco, CA',
-    orders: 8,
-    status: 'Active',
-    address: 'Silicon Park, SF',
-    gstNo: 'GSTIN2345678901',
-    pendingOrders: [],
-  },
-  3: {
-    id: 3,
-    name: 'Global Supplies',
-    email: 'orders@globalsupplies.com',
-    phone: '+91 9876543212',
-    location: 'Chicago, IL',
-    orders: 5,
-    status: 'Active',
-    address: 'Warehouse Lane, IL',
-    gstNo: 'GSTIN3456789012',
-    pendingOrders: [],
-  },
-  4: {
-    id: 4,
-    name: 'Local Manufacturing',
-    email: 'info@localmfg.com',
-    phone: '+91 9876543213',
-    location: 'Detroit, MI',
-    orders: 3,
-    status: 'Inactive',
-    address: 'Factory Road, MI',
-    gstNo: 'GSTIN4567890123',
-    pendingOrders: [],
-  },
-  5: {
-    id: 5,
-    name: 'City Builders',
-    email: 'projects@citybuilders.com',
-    phone: '+91 9876543214',
-    location: 'Dallas, TX',
-    orders: 7,
-    status: 'Active',
-    address: 'Construction Blvd, TX',
-    gstNo: 'GSTIN5678901234',
-    pendingOrders: [],
-  },
 };
 
 const CustomerPage = () => {
@@ -95,144 +47,113 @@ const CustomerPage = () => {
 
   if (!customer) {
     return (
-      <div className='flex flex-col items-center justify-center h-full p-6'>
-        <h1 className='text-2xl font-bold mb-4'>Customer Not Found</h1>
-        <p className='text-gray-500 mb-6'>
+      <div className="min-h-screen bg-[#2d2d2d] text-white flex flex-col justify-center items-center p-4">
+        <h1 className="text-2xl font-bold mb-2 text-[#ff851b]">Customer Not Found</h1>
+        <p className="text-[#a0a0a0] mb-6 text-center max-w-md">
           The customer you're looking for doesn't exist or has been removed.
         </p>
         <button
-          className='btn btn-outline'
+          className="btn border border-white text-white"
           onClick={() => navigate('/customers')}
         >
-          <ArrowLeft className='w-4 h-4 mr-2' />
+          <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Customers
         </button>
       </div>
     );
   }
 
-  const copyCustomerLink = (customerId) => {
-    const url = `${window.location.origin}/customers/${customerId}`;
+  const copyCustomerLink = (id) => {
+    const url = `${window.location.origin}/customers/${id}`;
     navigator.clipboard.writeText(url);
     alert(`Link copied: ${url}`);
   };
 
   return (
-    <div className='p-4 space-y-6'>
-      <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4'>
-        <div className='flex items-center gap-3'>
+    <div className="min-h-screen bg-[#2d2d2d] text-white p-4 space-y-6">
+      <div className="flex justify-between items-center">
+        <div className="flex items-center gap-3">
           <button
-            className='btn btn-sm btn-outline'
             onClick={() => navigate('/customers')}
+            className="btn btn-sm border border-[#ff851b] text-[#ff851b] hover:bg-[#ff851b] hover:text-white"
           >
-            <ArrowLeft className='w-4 h-4' />
+            <ArrowLeft className="w-4 h-4" />
           </button>
           <div>
-            <h1 className='text-2xl font-bold'>{customer.name}</h1>
-            <p className='text-sm text-gray-500'>Customer ID: {customer.id}</p>
+            <h1 className="text-2xl font-bold text-[#ff851b]">{customer.name}</h1>
+            <p className="text-sm text-[#a0a0a0]">Customer ID: {customer.id}</p>
           </div>
         </div>
-        <div className='flex gap-2'>
-          <button className='btn btn-sm btn-outline' onClick={() => copyCustomerLink(customer.id)}>
-            <Copy className='w-4 h-4 mr-2' />
+        <div className="flex gap-2">
+          <button
+            onClick={() => copyCustomerLink(customer.id)}
+            className="btn btn-sm border border-white text-white"
+          >
+            <Copy className="w-4 h-4 mr-2" />
             Copy Link
           </button>
           <button
-            className='btn btn-sm bg-orange-500 text-white hover:bg-orange-600'
-            onClick={() => navigate(`/dashboard/customers/${id}/edit`)}
+            onClick={() => navigate(`/dashboard/customers/${customer.id}/edit`)}
+            className="btn btn-sm bg-[#ff851b] text-white hover:bg-orange-500"
           >
             Edit Customer
           </button>
         </div>
       </div>
 
-      <div className='grid md:grid-cols-3 gap-4'>
-        <div className='card bg-base-100 p-4 shadow'>
-          <h2 className='font-bold mb-2'>Status</h2>
-          <div className='flex items-center gap-4'>
-            <div
-              className={`badge ${
-                customer.status === 'Active'
-                  ? 'badge-outline'
-                  : 'badge-secondary'
-              }`}
-            >
+      <div className="grid md:grid-cols-3 gap-4">
+        <Card title="Status">
+          <div className="flex items-center justify-between">
+            <div className="badge border border-[#ff851b] text-[#ff851b] bg-transparent">
               {customer.status}
             </div>
-            <p className='text-sm text-gray-500'>
-              Total Orders: {customer.orders}
-            </p>
+            <p className="text-sm text-[#a0a0a0]">Total Orders: {customer.orders}</p>
           </div>
-        </div>
+        </Card>
 
-        <div className='card bg-base-100 p-4 shadow'>
-          <h2 className='font-bold mb-2'>GST Number</h2>
-          <p className='text-lg'>{customer.gstNo}</p>
-        </div>
+        <Card title="GST Number">
+          <p className="text-lg">{customer.gstNo}</p>
+        </Card>
 
-        <div className='card bg-base-100 p-4 shadow'>
-          <h2 className='font-bold mb-2'>Location</h2>
-          <div className='flex items-center gap-2'>
-            <MapPin className='w-5 h-5 text-gray-500' />
-            <span className='text-lg'>{customer.location}</span>
+        <Card title="Location">
+          <div className="flex items-center gap-2">
+            <MapPin className="w-5 h-5 text-[#a0a0a0]" />
+            <span>{customer.location}</span>
           </div>
-        </div>
+        </Card>
       </div>
 
-      <div className='grid md:grid-cols-3 gap-6'>
-        <div className='space-y-6'>
-          <div className='card bg-base-100 p-4 shadow'>
-            <h2 className='font-bold mb-4'>Contact Information</h2>
-            <div className='space-y-3 text-sm'>
-              <InfoRow icon={<User />} label='Name' value={customer.name} />
-              <InfoRow icon={<Phone />} label='Phone' value={customer.phone} />
-              <InfoRow icon={<Mail />} label='Email' value={customer.email} />
-              <InfoRow
-                icon={<MapPin />}
-                label='Address'
-                value={customer.address}
-              />
+      <div className="grid md:grid-cols-3 gap-6">
+        <div className="space-y-6">
+          <Card title="Contact Information">
+            <div className="space-y-3 text-sm">
+              <InfoRow icon={<User />} label="Name" value={customer.name} />
+              <InfoRow icon={<Phone />} label="Phone" value={customer.phone} />
+              <InfoRow icon={<Mail />} label="Email" value={customer.email} />
+              <InfoRow icon={<MapPin />} label="Address" value={customer.address} />
             </div>
-          </div>
+          </Card>
 
-          <div className='card bg-base-100 p-4 shadow'>
-            <h2 className='font-bold mb-4'>Business Details</h2>
-            <div className='flex justify-between mb-2'>
-              <span className='text-gray-500'>GST Number:</span>
-              <span>{customer.gstNo}</span>
-            </div>
-            <div className='flex justify-between mb-2'>
-              <span className='text-gray-500'>Total Orders:</span>
-              <span>{customer.orders}</span>
-            </div>
-            <div className='flex justify-between'>
-              <span className='text-gray-500'>Status:</span>
-              <div
-                className={`badge ${
-                  customer.status === 'Active'
-                    ? 'badge-outline'
-                    : 'badge-secondary'
-                }`}
-              >
-                {customer.status}
-              </div>
-            </div>
-          </div>
+          <Card title="Business Details">
+            <Row label="GST Number" value={customer.gstNo} />
+            <Row label="Total Orders" value={customer.orders} />
+            <Row
+              label="Status"
+              value={
+                <span className="badge border border-[#ff851b] text-[#ff851b] bg-transparent">
+                  {customer.status}
+                </span>
+              }
+            />
+          </Card>
         </div>
 
-        <div className='md:col-span-2 space-y-6'>
-          <div className='card bg-base-100 p-4 shadow'>
-            <div className='mb-4'>
-              <h2 className='text-lg font-bold'>Pending Orders</h2>
-              <p className='text-sm text-gray-500'>
-                Orders that are not yet delivered
-              </p>
-            </div>
-
-            {customer.pendingOrders?.length ? (
-              <div className='overflow-x-auto'>
-                <table className='table table-zebra w-full'>
-                  <thead>
+        <div className="md:col-span-2">
+          <Card title="Pending Orders" subtitle="Orders that are not yet delivered">
+            {customer.pendingOrders.length ? (
+              <div className="overflow-x-auto">
+                <table className="table w-full text-sm">
+                  <thead className="text-white bg-[#1e1e1e]">
                     <tr>
                       <th>Order ID</th>
                       <th>Name</th>
@@ -244,24 +165,24 @@ const CustomerPage = () => {
                   </thead>
                   <tbody>
                     {customer.pendingOrders.map((order) => (
-                      <tr key={order.id}>
+                      <tr key={order.id} className="hover bg-[#2e2e2e]">
                         <td>{order.id}</td>
                         <td>{order.name}</td>
                         <td>
-                          <div
+                          <span
                             className={`badge ${getStatusBadge(order.status)}`}
                           >
                             {order.status}
-                          </div>
+                          </span>
                         </td>
-                        <td className='flex items-center gap-1'>
-                          <Calendar className='w-4 h-4 text-gray-500' />
+                        <td className="flex items-center gap-1">
+                          <Calendar className="w-4 h-4 text-[#a0a0a0]" />
                           {order.deadline}
                         </td>
                         <td>{order.total}</td>
                         <td>
                           <button
-                            className='btn btn-sm btn-outline'
+                            className="btn btn-sm border border-white text-white"
                             onClick={() =>
                               navigate(`/dashboard/orders/${order.id}`)
                             }
@@ -275,39 +196,54 @@ const CustomerPage = () => {
                 </table>
               </div>
             ) : (
-              <div className='p-8 text-center text-gray-500 border rounded-md'>
+              <div className="p-6 text-center text-[#a0a0a0] border border-gray-600 rounded-md">
                 No pending orders for this customer.
               </div>
             )}
-          </div>
+          </Card>
         </div>
       </div>
     </div>
   );
 };
 
+const Card = ({ title, subtitle, children }) => (
+  <div className="bg-[#1e1e1e] p-4 rounded-xl shadow border border-gray-700">
+    <h2 className="text-lg font-semibold text-[#ff851b]">{title}</h2>
+    {subtitle && <p className="text-sm text-[#a0a0a0] mb-2">{subtitle}</p>}
+    <div>{children}</div>
+  </div>
+);
+
 const InfoRow = ({ icon, label, value }) => (
-  <div className='flex items-start gap-2'>
-    <div className='mt-1 text-gray-500'>{icon}</div>
+  <div className="flex items-start gap-2">
+    <div className="mt-1 text-[#a0a0a0]">{icon}</div>
     <div>
-      <div className='font-medium'>{label}</div>
-      <div>{value}</div>
+      <div className="font-medium text-white">{label}</div>
+      <div className="text-[#a0a0a0]">{value}</div>
     </div>
+  </div>
+);
+
+const Row = ({ label, value }) => (
+  <div className="flex justify-between py-1 text-sm">
+    <span className="text-[#a0a0a0]">{label}:</span>
+    <span className="text-white">{value}</span>
   </div>
 );
 
 function getStatusBadge(status) {
   switch (status) {
     case 'Processing':
-      return 'badge-outline';
+      return 'border border-yellow-400 text-yellow-400 bg-transparent';
     case 'Ready for Delivery':
-      return 'badge-secondary';
+      return 'border border-cyan-400 text-cyan-400 bg-transparent';
     case 'Out for Delivery':
-      return 'badge-primary';
+      return 'border border-blue-400 text-blue-400 bg-transparent';
     case 'Under Process':
-      return 'badge-accent';
+      return 'border border-purple-400 text-purple-400 bg-transparent';
     default:
-      return 'badge-outline';
+      return 'border border-gray-400 text-gray-400 bg-transparent';
   }
 }
 
