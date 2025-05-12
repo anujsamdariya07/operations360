@@ -93,7 +93,7 @@ const CustomerPage = () => {
             Copy Link
           </button>
           <button
-            onClick={() => navigate(`/dashboard/customers/${customer.id}/edit`)}
+            
             className="btn btn-sm bg-[#ff851b] text-white hover:bg-orange-500"
           >
             Edit Customer

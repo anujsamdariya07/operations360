@@ -141,12 +141,7 @@ const Items = () => {
                     >
                       Details
                     </Link>
-                    <Link
-                      to={`/items/${product.id}/edit`}
-                      className='text-green-600 underline text-sm'
-                    >
-                      Edit
-                    </Link>
+
                     <button
                       onClick={() => copyOrderLink(product.id)}
                       className='inline-flex items-center gap-1 text-gray-400 text-sm hover:underline'

@@ -13,7 +13,7 @@ const Header = () => {
     >
       <div className='flex items-center gap-2'>
         <Link to={'/'}>
-        <img src={logo} alt='Logo' className='h-10 w-auto' />
+          <img src={logo} alt='Logo' className='h-10 w-auto' />
         </Link>
       </div>
 
@@ -26,13 +26,20 @@ const Header = () => {
             >
               Dashboard
             </Link>
-            <Link
-              to='/notifications'
-              className='px-4 py-2 border border-[#ff851b] text-[#ff851b] rounded-md font-medium transition duration-200 hover:bg-[#ff851b] hover:text-white shadow-md flex gap-1 justify-between items-center'
-            >
-              <Bell width={20} />
-              Notifications
-            </Link>
+            <details className='dropdown'>
+              <summary className='px-4 py-2 border border-[#ff851b] text-[#ff851b] rounded-md font-medium transition duration-200 hover:bg-[#ff851b] hover:text-white shadow-md flex gap-1 justify-between items-center btn m-1'>
+                <Bell width={20} />
+                Notifications
+              </summary>
+              <ul className='menu dropdown-content bg-base-100 rounded-box z-1 w-[10vw] p-2 shadow-sm'>
+                <li>
+                  <a>Item 1</a>
+                </li>
+                <li>
+                  <a>Item 2</a>
+                </li>
+              </ul>
+            </details>
           </>
         ) : (
           <>

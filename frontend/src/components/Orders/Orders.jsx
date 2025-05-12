@@ -170,7 +170,7 @@ const Orders = () => {
                   </Link>
                   {isCurrent && (
                     <Link
-                      to={`/dashboard/orders/${order.id}/edit`}
+                      to={`/orders`}
                       className='text-green-600 underline text-sm'
                     >
                       Edit
