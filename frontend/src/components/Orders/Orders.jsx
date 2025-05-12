@@ -169,12 +169,12 @@ const Orders = () => {
                     Details
                   </Link>
                   {isCurrent && (
-                    <a
-                      href={`/dashboard/orders/${order.id}/edit`}
+                    <Link
+                      to={`/dashboard/orders/${order.id}/edit`}
                       className='text-green-600 underline text-sm'
                     >
                       Edit
-                    </a>
+                    </Link>
                   )}
                   <button
                     onClick={() => copyOrderLink(order.id)}

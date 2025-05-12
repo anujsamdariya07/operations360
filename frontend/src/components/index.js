@@ -12,6 +12,10 @@ import OrderPage from './OrderPage/OrderPage';
 import CustomerPage from './CustomerPage/CustomerPage';
 import NewCustomer from './NewCustomer/NewCustomer';
 import NewOrder from './NewOrder/NewOrder';
+import ItemPage from './ItemPage/ItemPage';
+import NewItem from './NewItem/NewItem';
+import EmployeePage from './EmployeePage/EmployeePage';
+import NewEmployee from './NewEmployee/NewEmployee';
 
 export {
   Header,
@@ -28,4 +32,8 @@ export {
   CustomerPage,
   NewCustomer,
   NewOrder,
+  ItemPage,
+  NewItem,
+  EmployeePage,
+  NewEmployee,
 };
