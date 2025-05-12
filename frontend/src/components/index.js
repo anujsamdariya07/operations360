@@ -12,6 +12,8 @@ import OrderPage from './OrderPage/OrderPage';
 import CustomerPage from './CustomerPage/CustomerPage';
 import NewCustomer from './NewCustomer/NewCustomer';
 import NewOrder from './NewOrder/NewOrder';
+import ItemPage from './ItemPage/ItemPage';
+import NewItem from './NewItem/NewItem';
 
 export {
   Header,
@@ -28,4 +30,6 @@ export {
   CustomerPage,
   NewCustomer,
   NewOrder,
+  ItemPage,
+  NewItem,
 };

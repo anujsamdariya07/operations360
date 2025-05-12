@@ -12,8 +12,10 @@ import {
   Dashboard,
   Employees,
   Home,
+  ItemPage,
   Items,
   NewCustomer,
+  NewItem,
   NewOrder,
   OrderPage,
   Orders,
@@ -73,6 +75,14 @@ function App() {
         <Route
           path='items'
           element={!authUser ? <Items /> : <Navigate to={'/sign-in'} />}
+        />
+        <Route
+          path='items/:itemId'
+          element={!authUser ? <ItemPage /> : <Navigate to={'/sign-in'} />}
+        />
+        <Route
+          path='items/new'
+          element={!authUser ? <NewItem /> : <Navigate to={'/sign-in'} />}
         />
       </Route>
     )
