@@ -10,11 +10,13 @@ import {
   CustomerPage,
   Customers,
   Dashboard,
+  EmployeePage,
   Employees,
   Home,
   ItemPage,
   Items,
   NewCustomer,
+  NewEmployee,
   NewItem,
   NewOrder,
   OrderPage,
@@ -71,6 +73,14 @@ function App() {
         <Route
           path='employees'
           element={!authUser ? <Employees /> : <Navigate to={'/sign-in'} />}
+        />
+        <Route
+          path='employees/:employeeId'
+          element={!authUser ? <EmployeePage /> : <Navigate to={'/sign-in'} />}
+        />
+        <Route
+          path='employees/new'
+          element={!authUser ? <NewEmployee /> : <Navigate to={'/sign-in'} />}
         />
         <Route
           path='items'
