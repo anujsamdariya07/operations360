@@ -11,7 +11,8 @@ const employeeRoutes = require('./routes/employeeRoutes');
 const messageRoutes = require('./routes/messageRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const customerRoutes = require('./routes/customerRoutes');
-const billRoutes = require('./routes/billRoutes')
+const billRoutes = require('./routes/billRoutes');
+const vendorRoutes = require('./routes/vendorRoutes');
 
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
@@ -38,6 +39,7 @@ app.use('/api/organization', organizationRoutes);
 app.use('/api/item', itemRoutes);
 app.use('/api/employee', employeeRoutes);
 app.use('/api/bills', billRoutes);
+app.use('/api/vendor', vendorRoutes);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
