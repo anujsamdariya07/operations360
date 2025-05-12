@@ -122,7 +122,7 @@ const NewEmployee = () => {
           <button
             type='button'
             className='px-4 py-2 rounded border border-gray-600 text-gray-300 hover:bg-[#444]'
-            onClick={() => navigate('/dashboard/employees')}
+            onClick={() => navigate('/employees')}
           >
             Cancel
           </button>
