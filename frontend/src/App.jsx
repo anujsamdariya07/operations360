@@ -26,9 +26,24 @@ import {
 } from './components';
 import useAuthStore from './store/useAuthStore';
 import { useEffect } from 'react';
+import { Loader } from 'lucide-react';
 
 function App() {
   const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
+
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
+
+  if (isCheckingAuth && !authUser) {
+    // if (true) {
+    return (
+      <div className='flex items-center justify-center h-screen'>
+        <Loader className='size-10 animate-spin' />
+      </div>
+    );
+  }
+  console.log('authUser:', authUser);
 
   const router = createBrowserRouter(
     createRoutesFromElements(
@@ -44,63 +59,59 @@ function App() {
         />
         <Route
           path='dashboard'
-          element={!authUser ? <Dashboard /> : <Navigate to={'/sign-in'} />}
+          element={authUser ? <Dashboard /> : <Navigate to={'/sign-in'} />}
         />
         <Route
           path='orders'
-          element={!authUser ? <Orders /> : <Navigate to={'/sign-in'} />}
+          element={authUser ? <Orders /> : <Navigate to={'/sign-in'} />}
         />
         <Route
           path='orders/:orderId'
-          element={!authUser ? <OrderPage /> : <Navigate to={'/sign-in'} />}
+          element={authUser ? <OrderPage /> : <Navigate to={'/sign-in'} />}
         />
         <Route
           path='orders/new'
-          element={!authUser ? <NewOrder /> : <Navigate to={'/sign-in'} />}
+          element={authUser ? <NewOrder /> : <Navigate to={'/sign-in'} />}
         />
         <Route
           path='customers'
-          element={!authUser ? <Customers /> : <Navigate to={'/sign-in'} />}
+          element={authUser ? <Customers /> : <Navigate to={'/sign-in'} />}
         />
         <Route
           path='customers/:customerId'
-          element={!authUser ? <CustomerPage /> : <Navigate to={'/sign-in'} />}
+          element={authUser ? <CustomerPage /> : <Navigate to={'/sign-in'} />}
         />
         <Route
           path='customers/new'
-          element={!authUser ? <NewCustomer /> : <Navigate to={'/sign-in'} />}
+          element={authUser ? <NewCustomer /> : <Navigate to={'/sign-in'} />}
         />
         <Route
           path='employees'
-          element={!authUser ? <Employees /> : <Navigate to={'/sign-in'} />}
+          element={authUser ? <Employees /> : <Navigate to={'/sign-in'} />}
         />
         <Route
           path='employees/:employeeId'
-          element={!authUser ? <EmployeePage /> : <Navigate to={'/sign-in'} />}
+          element={authUser ? <EmployeePage /> : <Navigate to={'/sign-in'} />}
         />
         <Route
           path='employees/new'
-          element={!authUser ? <NewEmployee /> : <Navigate to={'/sign-in'} />}
+          element={authUser ? <NewEmployee /> : <Navigate to={'/sign-in'} />}
         />
         <Route
           path='items'
-          element={!authUser ? <Items /> : <Navigate to={'/sign-in'} />}
+          element={authUser ? <Items /> : <Navigate to={'/sign-in'} />}
         />
         <Route
           path='items/:itemId'
-          element={!authUser ? <ItemPage /> : <Navigate to={'/sign-in'} />}
+          element={authUser ? <ItemPage /> : <Navigate to={'/sign-in'} />}
         />
         <Route
           path='items/new'
-          element={!authUser ? <NewItem /> : <Navigate to={'/sign-in'} />}
+          element={authUser ? <NewItem /> : <Navigate to={'/sign-in'} />}
         />
       </Route>
     )
   );
-
-  useEffect(() => {
-    checkAuth();
-  }, [checkAuth]);
 
   return (
     <>

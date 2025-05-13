@@ -8,6 +8,6 @@ router.post('/sign-up', alreadyLoggedIn, signUp);
 
 router.post('/sign-in', alreadyLoggedIn, signIn);
 
-router.post('/check', alreadyLoggedIn, check);
+router.get('/check', check);
 
 module.exports = router;
