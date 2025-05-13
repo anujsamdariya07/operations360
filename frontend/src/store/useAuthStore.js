@@ -15,7 +15,9 @@ const useAuthStore = create((set) => ({
 
   checkAuth: async () => {
     try {
+      console.log('checkAuth-1')
       const res = await axiosInstance.get('/auth/check');
+      console.log('checkAuth-2')
       set({ authUser: res.data });
     } catch (error) {
       console.log('Error in checkAuth', error);
@@ -80,7 +82,7 @@ const useAuthStore = create((set) => ({
     set({ loading: true, error: null });
     try {
       const response = await axiosInstance.post('/auth/sign-up', orgData);
-      set({ loading: false });
+      set({ loading: false, authUser: response.data.employee, organization: response.data.organization });
 
       toast.success('Organization registered successfully!');
 
@@ -91,7 +93,7 @@ const useAuthStore = create((set) => ({
         error: error.response?.data?.message || 'Organization signup failed.',
       });
 
-      toast.error('Error registering organization!');
+      toast.error('Error registering organization!', error);
 
       return { success: false, error: error.response?.data?.message };
     }

@@ -10,8 +10,8 @@ const SignIn = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const res = await signIn(username, password);
-    if (res.success) navigate('/dashboard');
+    console.log({username, password})
+    navigate('/dashboard')
   };
 
   return (
@@ -40,7 +40,7 @@ const SignIn = () => {
         <button
           type='submit'
           disabled={loading}
-          className='w-full bg-[#ff851b] text-black py-3 rounded hover:bg-orange-500 font-semibold'
+          className='btn bg-[#ff851b] text-white hover:bg-[#ff571d] transition-all w-full'
         >
           {loading ? 'Signing In...' : 'Sign In'}
         </button>

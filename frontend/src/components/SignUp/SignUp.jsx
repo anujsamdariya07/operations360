@@ -1,9 +1,14 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { UserPlus } from 'lucide-react';
+import { LoaderCircle, UserPlus } from 'lucide-react';
+import useAuthStore from '../../store/useAuthStore';
+import toast from 'react-hot-toast';
+import { useEffect } from 'react';
 
 const Signup = () => {
   const navigate = useNavigate();
+
+  const { signUp, loading, authUser } = useAuthStore();
 
   const [orgForm, setOrgForm] = useState({
     name: '',
@@ -19,7 +24,7 @@ const Signup = () => {
     setOrgForm({ ...orgForm, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const { name, mobileNo, email, password, gstNo, address } = orgForm;
@@ -28,9 +33,18 @@ const Signup = () => {
       return;
     }
 
-    console.log('Organization created:', orgForm);
-    navigate('/sign-in');
+    const result = await signUp(orgForm);
+    if (result.success) {
+      console.log(result.success);
+      // navigate('/dashboard');
+    }
   };
+
+  useEffect(() => {
+    if (authUser) {
+      navigate('/dashboard');
+    }
+  }, [authUser, navigate]);
 
   return (
     <div className='min-h-screen bg-[#2d2d2d] text-white flex items-center justify-center px-4'>
@@ -109,17 +123,11 @@ const Signup = () => {
 
           <div className='flex justify-end gap-4 mt-4'>
             <button
-              type='button'
-              onClick={() => navigate('/login')}
-              className='btn border border-gray-600 text-gray-300 hover:bg-[#444] transition-all'
-            >
-              Cancel
-            </button>
-            <button
               type='submit'
               className='btn bg-[#ff851b] text-white hover:bg-[#ff571d] transition-all'
+              disabled={loading}
             >
-              Sign Up
+              {loading ? <LoaderCircle className='animate-spin' /> : 'Sign Up'}
             </button>
           </div>
         </form>

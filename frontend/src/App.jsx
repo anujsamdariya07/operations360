@@ -27,9 +27,12 @@ import {
 import useAuthStore from './store/useAuthStore';
 import { useEffect } from 'react';
 import { Loader } from 'lucide-react';
+import { Toaster } from 'react-hot-toast';
 
 function App() {
   const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
+
+  console.log('APP')
 
   useEffect(() => {
     checkAuth();
@@ -48,7 +51,7 @@ function App() {
   const router = createBrowserRouter(
     createRoutesFromElements(
       <Route path='/' element={<Layout />}>
-        <Route path='' element={<Home />} />
+        <Route path='' element={authUser ? <Home /> : <Navigate to={'/sign-in'} />} />
         <Route
           path='sign-in'
           element={!authUser ? <SignIn /> : <Navigate to={'/'} />}
@@ -116,6 +119,7 @@ function App() {
   return (
     <>
       <RouterProvider router={router} />
+      <Toaster position='bottom-right'/>
     </>
   );
 }

@@ -3,17 +3,24 @@ const jwt = require('jsonwebtoken');
 const Organization = require('../models/organization.model');
 const Employee = require('../models/employee.model');
 const sendWelcomeEmail = require('../utils/sendWelcomeEmail');
-const createToken = require('../utils/createToken');
+const generateToken = require('../utils/createToken');
 const generateEmployeeId = require('../utils/generateEmployeeId');
 
 const signUp = async (req, res) => {
-  try {
-    const { name, mobileNo, email, password, gstNo, address } = req.body;
+  console.log('HERE')
+  const { name, mobileNo, email, password, gstNo, address } = req.body;
 
+  try {
     if (!name || !mobileNo || !email || !password || !gstNo || !address) {
       return res
         .status(400)
         .json({ message: 'Please fill in all required fields.' });
+    }
+
+    if (password.length < 6) {
+      return res
+        .status(400)
+        .json({ message: 'Password must be at least 6 characters!' });
     }
 
     const existingOrg = await Organization.findOne({
@@ -28,7 +35,7 @@ const signUp = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const newOrganization = await Organization.create({
+    const newOrganization = new Organization({
       name,
       mobileNo,
       email,
@@ -38,8 +45,11 @@ const signUp = async (req, res) => {
       role: 'admin',
     });
 
-    let username = email.split('@')[0];
+    if (!newOrganization) {
+      return res.status(400).json({ message: 'Invalid Organization Data!' });
+    }
 
+    let username = email.split('@')[0];
     let existingEmployee = await Employee.findOne({ username });
 
     while (existingEmployee) {
@@ -50,7 +60,7 @@ const signUp = async (req, res) => {
 
     const employeeId = await generateEmployeeId(newOrganization._id.toString());
 
-    const adminEmployee = await Employee.create({
+    const adminEmployee = new Employee({
       orgId: newOrganization._id.toString(),
       id: employeeId,
       name,
@@ -63,12 +73,18 @@ const signUp = async (req, res) => {
     });
 
     newOrganization.employeeDetails.push(adminEmployee._id);
-    await newOrganization.save();
 
-    await sendWelcomeEmail({ to: email, name });
+    await newOrganization.save();
+    await adminEmployee.save();
+
+    generateToken(adminEmployee._id, res);
+
+    // await sendWelcomeEmail({ to: email, name });
 
     return res.status(201).json({
       message: 'Organization and admin employee created successfully.',
+      organization: newOrganization,
+      employee: adminEmployee,
     });
   } catch (error) {
     console.error('SignUp Error:', error);
@@ -137,8 +153,14 @@ const signIn = async (req, res) => {
 };
 
 const check = (req, res) => {
+  console.log('HERE')
   try {
-    res.status(200).json(req.user);
+    if (!req.user) {
+      console.log('HERE')
+      return res.status(401).json({ message: 'Not authenticated' });
+    }
+    console.log('HERE')
+    return res.status(200).json({data: req.user});
   } catch (error) {
     console.log('Error in checkAuth controller!', error.message);
     res.status(500).json({ message: 'Internal Server Error!' });
