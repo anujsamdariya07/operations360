@@ -15,9 +15,7 @@ const useAuthStore = create((set) => ({
 
   checkAuth: async () => {
     try {
-      console.log('checkAuth-1');
       const res = await axiosInstance.get('/auth/check');
-      console.log('checkAuth-2');
       set({ authUser: res.data });
     } catch (error) {
       console.log('Error in checkAuth', error);
@@ -34,6 +32,7 @@ const useAuthStore = create((set) => ({
         username,
         password,
       });
+      console.log('HERE')
 
       const { token, employee, organization, message } = response.data;
 
@@ -44,6 +43,7 @@ const useAuthStore = create((set) => ({
         isAuthenticated: true,
         mustChangePassword: false,
         loading: false,
+        authUser: employee
       });
 
       localStorage.setItem('auth_token', token);
@@ -72,7 +72,7 @@ const useAuthStore = create((set) => ({
         error: res?.data?.message || 'Login failed',
       });
 
-      toast.error('Error registering organization!');
+      toast.error('Error logging in!');
 
       return { success: false, error: res?.data?.message };
     }

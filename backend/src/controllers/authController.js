@@ -95,6 +95,7 @@ const signUp = async (req, res) => {
 };
 
 const signIn = async (req, res) => {
+  console.log('HERE')
   try {
     const { username, password } = req.body;
 
@@ -125,7 +126,8 @@ const signIn = async (req, res) => {
       });
     }
 
-    const token = createToken(employee);
+    const token = generateToken(employee._id, res);
+    console.log('token on signin:', token);
 
     return res.status(200).json({
       message: 'Login successful!',
@@ -153,13 +155,10 @@ const signIn = async (req, res) => {
 };
 
 const check = (req, res) => {
-  console.log('HERE');
   try {
     if (!req.user) {
-      console.log('HERE');
       return res.status(401).json({ message: 'Not authenticated' });
     }
-    console.log('HERE');
     return res.status(200).json({ data: req.user });
   } catch (error) {
     console.log('Error in checkAuth controller!', error.message);
@@ -180,5 +179,5 @@ module.exports = {
   signUp,
   signIn,
   check,
-  logout
+  logout,
 };

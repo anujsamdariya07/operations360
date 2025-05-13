@@ -1,18 +1,31 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import useAuthStore from '../../store/useAuthStore';
+import { LoaderCircle } from 'lucide-react';
 
 const SignIn = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const { signIn, loading } = useAuthStore();
+  const { signIn, loading, authUser } = useAuthStore();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log({username, password})
-    navigate('/dashboard')
+
+    const result = await signIn(username, password);
+
+    if (result.success) {
+      navigate('/dashboard');
+    } else if (result.requiresPasswordChange) {
+      navigate('/change-password');
+    }
   };
+
+    useEffect(() => {
+      if (authUser) {
+        navigate('/dashboard');
+      }
+    }, [authUser, navigate]);
 
   return (
     <div className='min-h-screen flex flex-col items-center justify-center bg-[#222222] text-[#ff851b] px-4'>
@@ -42,7 +55,7 @@ const SignIn = () => {
           disabled={loading}
           className='btn bg-[#ff851b] text-white hover:bg-[#ff571d] transition-all w-full'
         >
-          {loading ? 'Signing In...' : 'Sign In'}
+          {loading ? <LoaderCircle className='animate-spin' /> : 'Sign In'}
         </button>
       </form>
 
