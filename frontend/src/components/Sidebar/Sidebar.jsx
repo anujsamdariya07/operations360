@@ -1,5 +1,5 @@
-import React from 'react';
-import { NavLink } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { NavLink, useNavigate } from 'react-router-dom';
 import {
   Package,
   Users,
@@ -10,7 +10,9 @@ import {
 import useAuthStore from '../../store/useAuthStore';
 
 const Sidebar = ({ isOpen, setIsOpen }) => {
-  const { logout } = useAuthStore();
+  const { authUser, logout } = useAuthStore();
+
+  const navigate = useNavigate();
 
   const navItems = [
     { name: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
@@ -19,6 +21,18 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
     { name: 'Orders', icon: ShoppingCart, path: '/orders' },
     { name: 'Inventory', icon: Package, path: '/items' },
   ];
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/sign-in');
+    setIsOpen(false);
+  };
+
+  useEffect(() => {
+    if (!authUser) {
+      navigate('/dashboard');
+    }
+  }, [authUser, navigate]);
 
   return (
     <>
@@ -47,7 +61,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
 
           <button
             onClick={() => {
-              logout();
+              logout(navigate);
               setIsOpen(false);
             }}
             className='mt-6 flex items-center gap-3 text-red-400 hover:text-red-300 px-3 py-2 rounded-md transition'
@@ -90,10 +104,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
 
         <div className='pt-8'>
           <button
-            onClick={() => {
-              logout();
-              setIsOpen(false);
-            }}
+            onClick={handleLogout}
             className='flex items-center gap-3 text-red-400 hover:text-red-300 px-3 py-2 rounded-md transition'
           >
             <LogOut size={20} />

@@ -7,7 +7,7 @@ const generateToken = require('../utils/createToken');
 const generateEmployeeId = require('../utils/generateEmployeeId');
 
 const signUp = async (req, res) => {
-  console.log('HERE')
+  console.log('HERE');
   const { name, mobileNo, email, password, gstNo, address } = req.body;
 
   try {
@@ -153,16 +153,25 @@ const signIn = async (req, res) => {
 };
 
 const check = (req, res) => {
-  console.log('HERE')
+  console.log('HERE');
   try {
     if (!req.user) {
-      console.log('HERE')
+      console.log('HERE');
       return res.status(401).json({ message: 'Not authenticated' });
     }
-    console.log('HERE')
-    return res.status(200).json({data: req.user});
+    console.log('HERE');
+    return res.status(200).json({ data: req.user });
   } catch (error) {
     console.log('Error in checkAuth controller!', error.message);
+    res.status(500).json({ message: 'Internal Server Error!' });
+  }
+};
+
+const logout = async (req, res) => {
+  try {
+    res.cookie('jwt', '', { maxAge: 0 });
+    return res.status(200).json({ message: 'Logged Out Successfully!' });
+  } catch (error) {
     res.status(500).json({ message: 'Internal Server Error!' });
   }
 };
@@ -171,4 +180,5 @@ module.exports = {
   signUp,
   signIn,
   check,
+  logout
 };

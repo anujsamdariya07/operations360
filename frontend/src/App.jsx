@@ -4,6 +4,7 @@ import {
   Route,
   RouterProvider,
   Navigate,
+  useNavigate,
 } from 'react-router-dom';
 import Layout from './components/Layout';
 import {
@@ -37,7 +38,7 @@ function App() {
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
-
+  
   if (isCheckingAuth && !authUser) {
     // if (true) {
     return (
@@ -54,11 +55,11 @@ function App() {
         <Route path='' element={authUser ? <Home /> : <Navigate to={'/sign-in'} />} />
         <Route
           path='sign-in'
-          element={!authUser ? <SignIn /> : <Navigate to={'/'} />}
+          element={!authUser ? <SignIn /> : <Navigate to={'/dashboard'} />}
         />
         <Route
           path='sign-up'
-          element={!authUser ? <SignUp /> : <Navigate to={'/'} />}
+          element={!authUser ? <SignUp /> : <Navigate to={'/dashboard'} />}
         />
         <Route
           path='dashboard'

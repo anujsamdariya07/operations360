@@ -15,9 +15,9 @@ const useAuthStore = create((set) => ({
 
   checkAuth: async () => {
     try {
-      console.log('checkAuth-1')
+      console.log('checkAuth-1');
       const res = await axiosInstance.get('/auth/check');
-      console.log('checkAuth-2')
+      console.log('checkAuth-2');
       set({ authUser: res.data });
     } catch (error) {
       console.log('Error in checkAuth', error);
@@ -82,7 +82,11 @@ const useAuthStore = create((set) => ({
     set({ loading: true, error: null });
     try {
       const response = await axiosInstance.post('/auth/sign-up', orgData);
-      set({ loading: false, authUser: response.data.employee, organization: response.data.organization });
+      set({
+        loading: false,
+        authUser: response.data.employee,
+        organization: response.data.organization,
+      });
 
       toast.success('Organization registered successfully!');
 
@@ -99,16 +103,24 @@ const useAuthStore = create((set) => ({
     }
   },
 
-  logout: () => {
-    set({
-      token: null,
-      employee: null,
-      organization: null,
-      isAuthenticated: false,
-      mustChangePassword: false,
-      error: null,
-    });
-    localStorage.removeItem('auth_token');
+  logout: async () => {
+    try {
+      console.log('logout')
+      await axiosInstance.post('/auth/logout');
+      set({
+        token: null,
+        employee: null,
+        organization: null,
+        isAuthenticated: false,
+        mustChangePassword: false,
+        error: null,
+        authUser: null,
+      });
+      toast.success('Logged out successfully!');
+    } catch (error) {
+      toast.error(error?.response?.data?.message || 'Error logging out!');
+      console.log('ERROR: ', error);
+    }
   },
 
   setPasswordChanged: () => {
