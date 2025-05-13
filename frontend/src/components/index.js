@@ -16,6 +16,10 @@ import ItemPage from './ItemPage/ItemPage';
 import NewItem from './NewItem/NewItem';
 import EmployeePage from './EmployeePage/EmployeePage';
 import NewEmployee from './NewEmployee/NewEmployee';
+import Vendors from './Vendor/VendorPage';
+import NewVendor from './Vendor/NewVendorPage';
+import VendorDetails from './Vendor/VendorDetails';
+
 
 export {
   Header,
@@ -36,4 +40,7 @@ export {
   NewItem,
   EmployeePage,
   NewEmployee,
+  Vendors,
+  NewVendor,
+  VendorDetails,
 };

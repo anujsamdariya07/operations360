@@ -24,6 +24,9 @@ import {
   Orders,
   SignIn,
   SignUp,
+  Vendors,
+  NewVendor,
+  VendorDetails,
 } from './components';
 import useAuthStore from './store/useAuthStore';
 import { useEffect } from 'react';
@@ -111,14 +114,28 @@ function App() {
           path='items/new'
           element={authUser ? <NewItem /> : <Navigate to={'/sign-in'} />}
         />
+        <Route
+          path='vendors'
+          element={authUser ? <Vendors /> : <Navigate to={'/sign-in'} />}
+        />
+        <Route
+          path='vendors/new'
+          element={authUser ? <NewVendor /> : <Navigate to={'/sign-in'} />}
+        />
+        <Route
+          path='vendors/:vendorId'
+          element={authUser ? <VendorDetails /> : <Navigate to={'/sign-in'} />}
+        />
       </Route>
+      
+
     )
   );
 
   return (
     <>
       <RouterProvider router={router} />
-      <Toaster position='bottom-right'/>
+      <Toaster position='top-center'/>
     </>
   );
 }
