@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { ChevronDown, ChevronUp, Pencil } from 'lucide-react';
+import { useNavigate, useParams } from 'react-router-dom';
+import {
+  ChevronDown,
+  ChevronUp,
+  LoaderCircle,
+  Pencil,
+  Trash,
+} from 'lucide-react';
 import useItemStore from '../../store/useItemStore';
 
 const vendors = [
@@ -10,17 +16,27 @@ const vendors = [
 
 const ItemPage = () => {
   const { itemId } = useParams();
-  const { fetchItemById, selectedItem: item, updateItem } = useItemStore();
+  const {
+    fetchItemById,
+    selectedItem: item,
+    updateItem,
+    loading,
+    deleteItem,
+  } = useItemStore();
 
   const [isOpen, setIsOpen] = useState(false);
   const [selectedVendor, setSelectedVendor] = useState(null);
   const [showHistory, setShowHistory] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  const navigate = useNavigate();
 
   const [itemForUpdate, setItemForUpdate] = useState({
-    quantityUpdated: '',
-    threshold: '',
     vendor: '',
+    cost: 0,
+    threshold: 0,
     lastUpdated: '',
+    quantity: 0,
   });
 
   const currentDate = new Date().toISOString().split('T')[0];
@@ -38,10 +54,24 @@ const ItemPage = () => {
     }
   }, [item]);
 
+  useEffect(() => {
+    if (item?.updateHistory?.length > 0) {
+      console.log('Update history updated:', item.updateHistory);
+    }
+  }, [item?.updateHistory?.length]);
+
   const handleSave = async () => {
     console.log('Saving item update:', itemForUpdate);
-    await updateItem(item.id, itemForUpdate)
+    await updateItem(item.id, itemForUpdate);
+    await fetchItemById(itemId);
     setIsOpen(false);
+  };
+
+  const handleDelete = async (e) => {
+    console.log(`Deleting item with ID: ${item.id}`);
+    await deleteItem(itemId);
+    navigate('/items');
+    setShowDeleteConfirm(false);
   };
 
   if (!item) {
@@ -56,21 +86,30 @@ const ItemPage = () => {
     <div className='p-6 max-w-3xl mx-auto bg-[#2b2b2b] rounded-xl shadow-md text-white'>
       <div className='flex justify-between items-center mb-4'>
         <h1 className='text-3xl font-bold text-[#ff851b]'>{item.name}</h1>
-        <button
-          className='btn btn-sm btn-outline border-orange-500 text-orange-400 hover:bg-orange-500 hover:text-white'
-          onClick={() => {
-            setItemForUpdate({
-              quantityUpdated: item.quantity,
-              threshold: item.threshold,
-              vendor: item.vendorName || '',
-              lastUpdated: currentDate,
-            });
-            setIsOpen(true);
-          }}
-        >
-          <Pencil className='w-4 h-4 mr-1' />
-          Edit
-        </button>
+        <div className='flex space-x-3'>
+          <button
+            className='btn btn-sm btn-outline border-orange-500 text-orange-400 hover:bg-orange-500 hover:text-white flex items-center'
+            onClick={() => {
+              setItemForUpdate({
+                quantity: item.quantity,
+                threshold: item.threshold,
+                vendor: item.vendorName || '',
+                lastUpdated: currentDate,
+              });
+              setIsOpen(true);
+            }}
+          >
+            <Pencil className='w-4 h-4 mr-1' />
+            Edit
+          </button>
+
+          <button
+            className='btn btn-sm hover:btn-outline hover:border-red-500 hover:text-red-400 hover:bg-[#222222] bg-red-600 text-white flex items-center'
+            onClick={() => setShowDeleteConfirm(true)}
+          >
+            <Trash className='w-4 h-4 mr-1' /> Delete
+          </button>
+        </div>
       </div>
 
       <div className='flex flex-col md:flex-row gap-6 items-start'>
@@ -87,8 +126,7 @@ const ItemPage = () => {
         )}
         <div className='flex-1'>
           <p className='text-lg mb-2'>
-            <span className='font-semibold text-[#ff851b]'>SKU:</span>{' '}
-            {item.sku}
+            <span className='font-semibold text-[#ff851b]'>ID:</span> {item.id}
           </p>
           <p className='text-lg mb-2'>
             <span className='font-semibold text-[#ff851b]'>Quantity:</span>{' '}
@@ -187,13 +225,29 @@ const ItemPage = () => {
                 <input
                   type='number'
                   className='w-full px-4 py-2 rounded-lg bg-[#3a3a3a] text-white border border-[#555] focus:outline-none focus:ring-2 focus:ring-orange-500 transition'
-                  value={itemForUpdate.quantityUpdated}
+                  value={itemForUpdate.quantity}
                   onChange={(e) =>
                     setItemForUpdate({
                       ...itemForUpdate,
-                      quantityUpdated: Number(e.target.value),
+                      quantity: Number(e.target.value),
                     })
                   }
+                />
+              </div>
+
+              <div>
+                <label className='block text-sm text-gray-400 mb-1'>Cost</label>
+                <input
+                  type='number'
+                  className='w-full px-4 py-2 rounded-lg bg-[#3a3a3a] text-white border border-[#555] focus:outline-none focus:ring-2 focus:ring-orange-500 transition'
+                  value={itemForUpdate.cost}
+                  onChange={(e) =>
+                    setItemForUpdate({
+                      ...itemForUpdate,
+                      cost: Number(e.target.value),
+                    })
+                  }
+                  defaultValue={0}
                 />
               </div>
 
@@ -257,7 +311,11 @@ const ItemPage = () => {
                 className='px-5 py-2 bg-orange-500 text-black font-semibold rounded-lg hover:bg-orange-400 hover:text-white transition'
                 onClick={handleSave}
               >
-                Save Changes
+                {loading ? (
+                  <LoaderCircle className='animate-spin' />
+                ) : (
+                  'Save Changes'
+                )}
               </button>
               <button
                 className='px-5 py-2 border border-gray-500 text-gray-300 rounded-lg hover:text-white hover:border-white transition'
@@ -265,6 +323,42 @@ const ItemPage = () => {
               >
                 Cancel
               </button>
+            </div>
+          </div>
+        </dialog>
+      )}
+
+      {showDeleteConfirm && (
+        <dialog className='modal modal-open'>
+          <div className='modal-box bg-[#2c2c2c] text-white border border-red-500 shadow-2xl rounded-xl p-6'>
+            <h3 className='text-xl font-bold text-red-400 mb-4'>
+              Confirm Deletion
+            </h3>
+            <p className='mb-6'>
+              Are you sure you want to delete{' '}
+              <span className='font-semibold'>{item.name}</span>? This action
+              cannot be undone.
+            </p>
+
+            <div className='flex justify-end space-x-4'>
+              <div className='flex justify-end space-x-4'>
+                <button
+                  className='px-5 py-2 border border-red-600 bg-red-600 text-white rounded-lg font-medium hover:bg-transparent hover:text-red-400 transition-all duration-200'
+                  onClick={handleDelete}
+                >
+                  {loading ? (
+                    <LoaderCircle className='animate-spin' />
+                  ) : (
+                    'Confirm Delete'
+                  )}
+                </button>
+                <button
+                  className='px-5 py-2 border border-gray-500 text-gray-300 rounded-lg font-medium hover:text-white hover:border-white transition-all duration-200'
+                  onClick={() => setShowDeleteConfirm(false)}
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
           </div>
         </dialog>

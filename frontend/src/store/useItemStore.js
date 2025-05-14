@@ -45,14 +45,15 @@ const useItemStore = create((set) => ({
 
   updateItem: async (id, data) => {
     try {
+      console.log('updateItem-1');
       const res = await axiosInstance.put(`/item/items/${id}`, data);
-      console.log('updateItem')
+      console.log('updateItem-2');
       set((state) => ({
         items: state.items.map((item) =>
           item._id === id ? res.data.item : item
-      ),
-    }));
-    toast.success('Item Updated Successfully!');
+        ),
+      }));
+      toast.success('Item Updated Successfully!');
     } catch (err) {
       toast.error(err.message);
       console.error('Update Item Error:', err);
@@ -60,14 +61,18 @@ const useItemStore = create((set) => ({
   },
 
   deleteItem: async (id) => {
+    set({ loading: true });
     try {
-      await axiosInstance.delete(`/item/${id}`);
+      await axiosInstance.delete(`/item/items/${id}`);
       set((state) => ({
         items: state.items.filter((item) => item._id !== id),
       }));
+      toast.success('Item Deleted Successfully!');
     } catch (err) {
       console.error('Delete Item Error:', err);
+      toast.error(err?.message);
     }
+    set({ loading: false });
   },
 }));
 

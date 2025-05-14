@@ -2,12 +2,12 @@ const cloudinary = require('cloudinary');
 const Item = require('../models/item.model');
 const Employee = require('../models/employee.model');
 const Message = require('../models/message.model');
-const generateItemId = require('../utils/generateItemId')
+const generateItemId = require('../utils/generateItemId');
 
 const getAllItems = async (req, res) => {
   try {
     const orgId = req.user.orgId;
-    console.log('orgId:', orgId)
+    console.log('orgId:', orgId);
 
     const items = await Item.find({ orgId });
 
@@ -51,44 +51,44 @@ const createItem = async (req, res) => {
       quantity = 0,
       threshold = 10,
       image,
-      vendor:vendorName,
+      vendor: vendorName,
       cost,
     } = req.body;
 
-    console.log('req.body', req.body)
-    
+    console.log('req.body', req.body);
+
     if (!name || cost == null || !vendorName) {
       return res.status(400).json({
         message: 'Name, vendorName and cost are required.',
       });
     }
-    
+
     if (isNaN(cost)) {
       return res.status(400).json({
         message: 'Cost must be a valid number.',
       });
     }
-    
+
     const orgId = req.user.orgId;
-    
+
     if (!orgId) {
       return res.status(403).json({
         message: 'Unauthorized. Organization ID missing.',
       });
     }
-    
+
     let imageUrl =
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRo6ZeL1Ntu-zwEcgRli39ynixVj9yeQtfjAw&s';
-    
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRo6ZeL1Ntu-zwEcgRli39ynixVj9yeQtfjAw&s';
+
     if (image) {
       const uploadResponse = await cloudinary.uploader.upload(image, {
         folder: 'inventory-items',
       });
       imageUrl = uploadResponse.secure_url;
     }
-    
+
     const id = await generateItemId(orgId);
-    
+
     const newItem = await Item.create({
       orgId,
       id,
@@ -104,7 +104,7 @@ const createItem = async (req, res) => {
         },
       ],
     });
-    console.log('createItem-server')
+    console.log('createItem-server');
 
     return res.status(201).json({
       message: 'Item created successfully.',
@@ -117,7 +117,6 @@ const createItem = async (req, res) => {
       .json({ message: 'Server error. Please try again later.' });
   }
 };
-
 
 // const updateItem = async (req, res) => {
 //   try {
@@ -186,7 +185,7 @@ const createItem = async (req, res) => {
 //         message: 'vendorName and cost are required for updating history.',
 //       });
 //     }
-    
+
 //     console.log('HERE');
 
 //     const orgId = req.user.orgId;
@@ -257,42 +256,56 @@ const createItem = async (req, res) => {
 // };
 
 const updateItem = async (req, res) => {
+  console.log('req.body', req.body);
+  console.log('server-1');
   try {
+    console.log('server-2');
     const { id: itemId } = req.params;
-    console.log(itemId)
-    const { quantity, threshold, vendor:vendorName, cost } = req.body;
-    
+    console.log('server-3');
+    console.log(itemId);
+    const { quantity, threshold, vendor: vendorName, cost } = req.body;
+    console.log('server-4');
+
     if (!vendorName || cost == null) {
-      console.log('HERE');
+      console.log('server-5');
       return res.status(400).json({
         message: 'vendorName and cost are required for updating history.',
       });
     }
-    
+
+    console.log('server-6');
 
     const orgId = req.user.orgId;
+    console.log('server-7');
 
     if (!orgId) {
-      return res.status(403).json({ message: 'Unauthorized. Organization ID missing.' });
+      console.log('server-8');
+      return res
+        .status(403)
+        .json({ message: 'Unauthorized. Organization ID missing.' });
     }
 
+    console.log('server-9');
     const item = await Item.findOne({ id: itemId, orgId });
 
     if (!item) {
+      console.log('server-10');
       return res.status(404).json({ message: 'Item not found.' });
     }
 
     // Calculate the new quantity
     const oldQuantity = item.quantity;
-    const newQuantity = quantity ? Number(quantity) + Number(oldQuantity) : oldQuantity;
+    const newQuantity = quantity
+      ? Number(quantity) + Number(oldQuantity)
+      : oldQuantity;
 
     // Calculate the quantity updated (difference between new and old quantity)
     const quantityUpdated = quantity;
 
     // Update item properties
-    item.name = name || item.name;
     item.quantity = newQuantity;
     item.threshold = threshold ?? item.threshold;
+    console.log('server-10');
 
     // Add to updateHistory with the new data
     item.updateHistory.push({
@@ -300,12 +313,15 @@ const updateItem = async (req, res) => {
       quantityUpdated,
       cost,
     });
+    console.log('server-11');
 
     await item.save();
+    console.log('server-12');
 
     // For low stock alert
     if (item.quantity < item.threshold) {
       const orgEmployees = await Employee.find({ orgId });
+      console.log('server-12');
 
       const admin = orgEmployees.find((emp) => emp.role === 'admin');
       const manager = orgEmployees.find((emp) => emp.role === 'manager');
@@ -326,22 +342,29 @@ const updateItem = async (req, res) => {
     });
   } catch (error) {
     console.error('Update Item Error:', error);
-    return res.status(500).json({ message: 'Server error. Please try again later.' });
+    return res
+      .status(500)
+      .json({ message: 'Server error. Please try again later.' });
   }
 };
 
-
 const deleteItem = async (req, res) => {
+  console.log('server-1');
   try {
     const { id } = req.params;
+    const orgId = req.user.orgId;
+    console.log('id', id);
+    console.log('server-2');
 
-    const item = await Item.findById(id);
+    const item = await Item.findOneAndDelete({ id, orgId });
+    console.log('server-4');
 
     if (!item) {
+      console.log('server-5');
       return res.status(404).json({ message: 'Item not found.' });
     }
 
-    await Item.findByIdAndDelete(id);
+    console.log('server-6');
 
     return res.status(200).json({ message: 'Item deleted successfully.' });
   } catch (error) {

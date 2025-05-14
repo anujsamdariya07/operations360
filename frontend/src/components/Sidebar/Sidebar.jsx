@@ -20,6 +20,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
     { name: 'Customers', icon: Users, path: '/customers' },
     { name: 'Orders', icon: ShoppingCart, path: '/orders' },
     { name: 'Inventory', icon: Package, path: '/items' },
+    { name: 'Vendors', icon: Package, path: '/vendors' },
   ];
 
   const handleLogout = async () => {
