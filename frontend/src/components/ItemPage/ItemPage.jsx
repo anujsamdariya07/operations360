@@ -1,65 +1,48 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Pencil } from 'lucide-react';
+import { ChevronDown, ChevronUp, Pencil } from 'lucide-react';
+import useItemStore from '../../store/useItemStore';
 
-const products = [
-  {
-    id: '1',
-    name: 'Product 1',
-    sku: 'P001',
-    quantity: 5,
-    threshold: 10,
-    lastUpdated: '2025-05-10',
-    image: '/path/to/image.jpg',
-    vendorName: 'Global Supplies Inc.',
-  },
-  {
-    id: '2',
-    name: 'Product 2',
-    sku: 'P002',
-    quantity: 3,
-    threshold: 5,
-    lastUpdated: '2025-05-11',
-    image: '/path/to/image.jpg',
-    vendorName: 'Global Supplies Inc.',
-  },
-];
-
-// Add this at the top, outside the component
 const vendors = [
-  {
-    name: 'Global Supplies Inc.',
-    email: 'contact@globalsupplies.com',
-    phone: '9876543210',
-    gst: '27AABCU9603R1Z2',
-    address: '123 Industrial Area, Mumbai',
-  },
-  {
-    name: 'TechTrade Co.',
-    email: 'sales@techtrade.com',
-    phone: '9123456789',
-    gst: '29AACCT1234A1ZV',
-    address: '55 Tech Park, Bengaluru',
-  },
-  {
-    name: 'Metro Distributors',
-    email: 'info@metrodistributors.com',
-    phone: '9988776655',
-    gst: '07AAACM1234K1ZB',
-    address: 'Plot 67, Delhi NCR',
-  },
+  { name: 'Vendor A', gst: 'GST-1' },
+  { name: 'Vendor B', gst: 'GST-2' },
 ];
 
 const ItemPage = () => {
   const { itemId } = useParams();
-  const item = products.find((product) => product.id === itemId);
+  const { fetchItemById, selectedItem: item, updateItem } = useItemStore();
 
   const [isOpen, setIsOpen] = useState(false);
-  const [quantity, setQuantity] = useState(item?.quantity || 0);
-  const [threshold, setThreshold] = useState(item?.threshold || 0);
-  const [vendorName, setVendorName] = useState(item?.vendorName || 0);
-  const [vendor, setVendor] = useState('');
+  const [selectedVendor, setSelectedVendor] = useState(null);
+  const [showHistory, setShowHistory] = useState(false);
+
+  const [itemForUpdate, setItemForUpdate] = useState({
+    quantityUpdated: '',
+    threshold: '',
+    vendor: '',
+    lastUpdated: '',
+  });
+
   const currentDate = new Date().toISOString().split('T')[0];
+
+  useEffect(() => {
+    if (itemId) {
+      fetchItemById(itemId);
+    }
+  }, [itemId, fetchItemById]);
+
+  useEffect(() => {
+    if (item) {
+      const foundVendor = vendors.find((v) => v.name === item.vendorName);
+      setSelectedVendor(foundVendor);
+    }
+  }, [item]);
+
+  const handleSave = async () => {
+    console.log('Saving item update:', itemForUpdate);
+    await updateItem(item.id, itemForUpdate)
+    setIsOpen(false);
+  };
 
   if (!item) {
     return (
@@ -75,7 +58,15 @@ const ItemPage = () => {
         <h1 className='text-3xl font-bold text-[#ff851b]'>{item.name}</h1>
         <button
           className='btn btn-sm btn-outline border-orange-500 text-orange-400 hover:bg-orange-500 hover:text-white'
-          onClick={() => setIsOpen(true)}
+          onClick={() => {
+            setItemForUpdate({
+              quantityUpdated: item.quantity,
+              threshold: item.threshold,
+              vendor: item.vendorName || '',
+              lastUpdated: currentDate,
+            });
+            setIsOpen(true);
+          }}
         >
           <Pencil className='w-4 h-4 mr-1' />
           Edit
@@ -83,7 +74,6 @@ const ItemPage = () => {
       </div>
 
       <div className='flex flex-col md:flex-row gap-6 items-start'>
-        {/* Right: Item image */}
         {item.image && (
           <img
             src={
@@ -95,7 +85,6 @@ const ItemPage = () => {
             className='rounded-lg w-[30vw] object-cover border border-gray-700'
           />
         )}
-        {/* Left: Item details */}
         <div className='flex-1'>
           <p className='text-lg mb-2'>
             <span className='font-semibold text-[#ff851b]'>SKU:</span>{' '}
@@ -103,24 +92,86 @@ const ItemPage = () => {
           </p>
           <p className='text-lg mb-2'>
             <span className='font-semibold text-[#ff851b]'>Quantity:</span>{' '}
-            {quantity}
+            {item.quantity}
           </p>
           <p className='text-lg mb-2'>
             <span className='font-semibold text-[#ff851b]'>Threshold:</span>{' '}
-            {threshold}
+            {item.threshold}
           </p>
-          <p className='text-lg'>
+          <p className='text-lg mb-2'>
             <span className='font-semibold text-[#ff851b]'>Last Updated:</span>{' '}
             {currentDate}
           </p>
-          <p className='text-lg'>
-            <span className='font-semibold text-[#ff851b]'>Vendor Name:</span>{' '}
-            {vendorName}
-          </p>
+
+          {selectedVendor && (
+            <div className='mt-4 text-sm text-gray-300 space-y-1 border-t border-gray-700 pt-4'>
+              <p>
+                <span className='text-[#ff851b] font-medium'>Email:</span>{' '}
+                {selectedVendor.email}
+              </p>
+              <p>
+                <span className='text-[#ff851b] font-medium'>Phone:</span>{' '}
+                {selectedVendor.phone}
+              </p>
+              <p>
+                <span className='text-[#ff851b] font-medium'>GST:</span>{' '}
+                {selectedVendor.gst}
+              </p>
+              <p>
+                <span className='text-[#ff851b] font-medium'>Address:</span>{' '}
+                {selectedVendor.address}
+              </p>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Modal */}
+      {item.updateHistory?.length > 0 && (
+        <div className='mt-8'>
+          <button
+            onClick={() => setShowHistory(!showHistory)}
+            className='flex items-center text-[#ff851b] font-semibold text-lg mb-2 hover:underline'
+          >
+            {showHistory ? (
+              <ChevronUp className='w-4 h-4 mr-2' />
+            ) : (
+              <ChevronDown className='w-4 h-4 mr-2' />
+            )}
+            {showHistory ? 'Hide Update History' : 'Show Update History'}
+          </button>
+
+          {showHistory && (
+            <div className='overflow-x-auto border border-gray-700 rounded-lg'>
+              <table className='table w-full text-sm'>
+                <thead>
+                  <tr className='bg-[#1f1f1f] text-[#ff851b]'>
+                    <th className='px-4 py-2 text-left'>Vendor</th>
+                    <th className='px-4 py-2 text-left'>Cost</th>
+                    <th className='px-4 py-2 text-left'>Quantity</th>
+                    <th className='px-4 py-2 text-left'>Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {item.updateHistory.map((entry, index) => (
+                    <tr
+                      key={index}
+                      className='border-t border-gray-700 hover:bg-[#383838] transition'
+                    >
+                      <td className='px-4 py-2'>{entry.vendorName}</td>
+                      <td className='px-4 py-2'>₹{entry.cost}</td>
+                      <td className='px-4 py-2'>{entry.quantityUpdated}</td>
+                      <td className='px-4 py-2'>
+                        {new Date(entry.date).toLocaleDateString('en-IN')}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+
       {isOpen && (
         <dialog className='modal modal-open'>
           <div className='modal-box bg-gradient-to-br from-[#1f1f1f] to-[#2d2d2d] text-white border border-[#444] shadow-2xl rounded-2xl p-6 transition-all duration-300 ease-in-out'>
@@ -136,8 +187,13 @@ const ItemPage = () => {
                 <input
                   type='number'
                   className='w-full px-4 py-2 rounded-lg bg-[#3a3a3a] text-white border border-[#555] focus:outline-none focus:ring-2 focus:ring-orange-500 transition'
-                  value={quantity}
-                  onChange={(e) => setQuantity(Number(e.target.value))}
+                  value={itemForUpdate.quantityUpdated}
+                  onChange={(e) =>
+                    setItemForUpdate({
+                      ...itemForUpdate,
+                      quantityUpdated: Number(e.target.value),
+                    })
+                  }
                 />
               </div>
 
@@ -148,8 +204,13 @@ const ItemPage = () => {
                 <input
                   type='number'
                   className='w-full px-4 py-2 rounded-lg bg-[#3a3a3a] text-white border border-[#555] focus:outline-none focus:ring-2 focus:ring-orange-500 transition'
-                  value={threshold}
-                  onChange={(e) => setThreshold(Number(e.target.value))}
+                  value={itemForUpdate.threshold}
+                  onChange={(e) =>
+                    setItemForUpdate({
+                      ...itemForUpdate,
+                      threshold: Number(e.target.value),
+                    })
+                  }
                 />
               </div>
 
@@ -159,8 +220,13 @@ const ItemPage = () => {
                 </label>
                 <select
                   className='w-full px-4 py-2 rounded-lg bg-[#3a3a3a] text-white border border-[#555] focus:outline-none focus:ring-2 focus:ring-orange-500 transition'
-                  value={vendor}
-                  onChange={(e) => setVendor(e.target.value)}
+                  value={itemForUpdate.vendor}
+                  onChange={(e) =>
+                    setItemForUpdate({
+                      ...itemForUpdate,
+                      vendor: e.target.value,
+                    })
+                  }
                 >
                   <option value='' disabled>
                     -- Choose a vendor --
@@ -180,7 +246,7 @@ const ItemPage = () => {
                 <input
                   type='date'
                   className='w-full px-4 py-2 rounded-lg bg-[#2c2c2c] text-gray-400 border border-[#555] cursor-not-allowed'
-                  value={currentDate}
+                  value={itemForUpdate.lastUpdated}
                   readOnly
                 />
               </div>
@@ -189,7 +255,7 @@ const ItemPage = () => {
             <div className='modal-action mt-8 flex justify-end space-x-3'>
               <button
                 className='px-5 py-2 bg-orange-500 text-black font-semibold rounded-lg hover:bg-orange-400 hover:text-white transition'
-                onClick={() => setIsOpen(false)}
+                onClick={handleSave}
               >
                 Save Changes
               </button>

@@ -1,29 +1,41 @@
 const jwt = require('jsonwebtoken');
+const Employee = require('../models/employee.model');
 
-const isAuthenticated = (req, res, next) => {
+const isAuthenticated = async (req, res, next) => {
   try {
-    const authHeader = req.headers.authorization;
+    const token = req.cookies.jwt;
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    if (!token) {
       return res
         .status(401)
         .json({ message: 'Unauthorized: No token provided' });
     }
 
-    const token = authHeader.split(' ')[1];
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
+    if (!decoded) {
+      return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+    }
+
+    const employee = await Employee.findById(decoded.id).select('-password');
+
+    if (!employee) {
+      return res
+        .status(401)
+        .json({ message: 'Unauthorized: Employee not found' });
+    }
+
     req.user = {
-      employeeId: decoded.employeeId,
-      orgId: decoded.orgId,
-      role: decoded.role,
-      email: decoded.email,
-      name: decoded.name,
+      employeeId: employee._id,
+      orgId: employee.orgId,
+      role: employee.role,
+      email: employee.email,
+      name: employee.name,
     };
 
     next();
   } catch (error) {
-    console.error(error);
+    console.error('Authentication Error:', error);
     return res.status(401).json({ message: 'Unauthorized: Invalid token' });
   }
 };

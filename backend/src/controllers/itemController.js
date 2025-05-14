@@ -2,10 +2,12 @@ const cloudinary = require('cloudinary');
 const Item = require('../models/item.model');
 const Employee = require('../models/employee.model');
 const Message = require('../models/message.model');
+const generateItemId = require('../utils/generateItemId')
 
 const getAllItems = async (req, res) => {
   try {
     const orgId = req.user.orgId;
+    console.log('orgId:', orgId)
 
     const items = await Item.find({ orgId });
 
@@ -49,49 +51,60 @@ const createItem = async (req, res) => {
       quantity = 0,
       threshold = 10,
       image,
-      vendorName,
+      vendor:vendorName,
       cost,
     } = req.body;
 
-    if (!name || cost == null || vendorName) {
+    console.log('req.body', req.body)
+    
+    if (!name || cost == null || !vendorName) {
       return res.status(400).json({
         message: 'Name, vendorName and cost are required.',
       });
     }
-
-    const orgId = req.user.orgId;
-
-    if (!orgId) {
-      return res
-        .status(403)
-        .json({ message: 'Unauthorized. Organization ID missing.' });
+    
+    if (isNaN(cost)) {
+      return res.status(400).json({
+        message: 'Cost must be a valid number.',
+      });
     }
-
+    
+    const orgId = req.user.orgId;
+    
+    if (!orgId) {
+      return res.status(403).json({
+        message: 'Unauthorized. Organization ID missing.',
+      });
+    }
+    
     let imageUrl =
-      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRo6ZeL1Ntu-zwEcgRli39ynixVj9yeQtfjAw&s';
-
+    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRo6ZeL1Ntu-zwEcgRli39ynixVj9yeQtfjAw&s';
+    
     if (image) {
-      const uploadResponse = await cloudinary.uploader.upload(image);
+      const uploadResponse = await cloudinary.uploader.upload(image, {
+        folder: 'inventory-items',
+      });
       imageUrl = uploadResponse.secure_url;
     }
-
+    
     const id = await generateItemId(orgId);
-
+    
     const newItem = await Item.create({
       orgId,
       id,
-      name,
+      name: name.trim(),
       quantity,
       threshold,
       image: imageUrl,
       updateHistory: [
         {
-          vendorName,
+          vendorName: vendorName.trim(),
           quantityUpdated: quantity,
           cost,
         },
       ],
     });
+    console.log('createItem-server')
 
     return res.status(201).json({
       message: 'Item created successfully.',
@@ -104,6 +117,7 @@ const createItem = async (req, res) => {
       .json({ message: 'Server error. Please try again later.' });
   }
 };
+
 
 // const updateItem = async (req, res) => {
 //   try {
@@ -162,43 +176,125 @@ const createItem = async (req, res) => {
 //   }
 // };
 
+// const updateItem = async (req, res) => {
+//   try {
+//     const { id: itemId } = req.params;
+//     const { name, quantity, threshold, image, vendorName, cost } = req.body;
+
+//     if (!vendorName || cost == null) {
+//       return res.status(400).json({
+//         message: 'vendorName and cost are required for updating history.',
+//       });
+//     }
+    
+//     console.log('HERE');
+
+//     const orgId = req.user.orgId;
+
+//     if (!orgId) {
+//       return res.status(403).json({ message: 'Unauthorized. Organization ID missing.' });
+//     }
+
+//     const item = await Item.findOne({ id: itemId, orgId });
+
+//     if (!item) {
+//       return res.status(404).json({ message: 'Item not found.' });
+//     }
+
+//     let imageUrl = item.image;
+//     if (image) {
+//       const uploadResponse = await cloudinary.uploader.upload(image);
+//       imageUrl = uploadResponse.secure_url;
+//     }
+
+//     // Calculate the new quantity
+//     const oldQuantity = item.quantity;
+//     const newQuantity = quantity ? Number(quantity) + Number(oldQuantity) : oldQuantity;
+
+//     // Calculate the quantity updated (difference between new and old quantity)
+//     const quantityUpdated = newQuantity - oldQuantity;
+
+//     // Update item properties
+//     item.name = name || item.name;
+//     item.quantity = newQuantity;
+//     item.threshold = threshold ?? item.threshold;
+//     item.image = imageUrl;
+
+//     // Add to updateHistory with the new data
+//     item.updateHistory.push({
+//       vendorName,
+//       quantityUpdated,
+//       cost,
+//     });
+
+//     await item.save();
+
+//     // For low stock alert
+//     if (item.quantity < item.threshold) {
+//       const orgEmployees = await Employee.find({ orgId });
+
+//       const admin = orgEmployees.find((emp) => emp.role === 'admin');
+//       const manager = orgEmployees.find((emp) => emp.role === 'manager');
+
+//       if (admin && manager) {
+//         await Message.create({
+//           senderId: admin.id,
+//           receiverId: manager.id,
+//           orgId,
+//           content: `⚠️ Alert: Item "${item.name}" quantity (${item.quantity}) is below threshold (${item.threshold}).`,
+//         });
+//       }
+//     }
+
+//     return res.status(200).json({
+//       message: 'Item updated successfully.',
+//       item,
+//     });
+//   } catch (error) {
+//     console.error('Update Item Error:', error);
+//     return res.status(500).json({ message: 'Server error. Please try again later.' });
+//   }
+// };
+
 const updateItem = async (req, res) => {
   try {
     const { id: itemId } = req.params;
-    const { name, quantity, threshold, image, vendorName, cost } = req.body;
-
+    console.log(itemId)
+    const { quantity, threshold, vendor:vendorName, cost } = req.body;
+    
     if (!vendorName || cost == null) {
+      console.log('HERE');
       return res.status(400).json({
         message: 'vendorName and cost are required for updating history.',
       });
     }
+    
 
     const orgId = req.user.orgId;
 
     if (!orgId) {
-      return res
-        .status(403)
-        .json({ message: 'Unauthorized. Organization ID missing.' });
+      return res.status(403).json({ message: 'Unauthorized. Organization ID missing.' });
     }
 
-    const item = await Item.findOne({ _id: itemId, orgId });
+    const item = await Item.findOne({ id: itemId, orgId });
 
     if (!item) {
       return res.status(404).json({ message: 'Item not found.' });
     }
 
-    let imageUrl = item.image;
-    if (image) {
-      const uploadResponse = await cloudinary.uploader.upload(image);
-      imageUrl = uploadResponse.secure_url;
-    }
+    // Calculate the new quantity
+    const oldQuantity = item.quantity;
+    const newQuantity = quantity ? Number(quantity) + Number(oldQuantity) : oldQuantity;
 
-    const quantityUpdated = quantity - item.quantity;
+    // Calculate the quantity updated (difference between new and old quantity)
+    const quantityUpdated = quantity;
 
+    // Update item properties
     item.name = name || item.name;
-    item.quantity = quantity ?? item.quantity;
+    item.quantity = newQuantity;
     item.threshold = threshold ?? item.threshold;
-    item.image = imageUrl;
+
+    // Add to updateHistory with the new data
     item.updateHistory.push({
       vendorName,
       quantityUpdated,
@@ -207,7 +303,7 @@ const updateItem = async (req, res) => {
 
     await item.save();
 
-    // For low stock
+    // For low stock alert
     if (item.quantity < item.threshold) {
       const orgEmployees = await Employee.find({ orgId });
 
@@ -230,11 +326,10 @@ const updateItem = async (req, res) => {
     });
   } catch (error) {
     console.error('Update Item Error:', error);
-    return res
-      .status(500)
-      .json({ message: 'Server error. Please try again later.' });
+    return res.status(500).json({ message: 'Server error. Please try again later.' });
   }
 };
+
 
 const deleteItem = async (req, res) => {
   try {

@@ -1,56 +1,44 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaRegTrashAlt, FaPlus } from 'react-icons/fa';
-import { CiEdit } from 'react-icons/ci';
-import { LuCopy } from 'react-icons/lu';
-import { Link } from 'react-router-dom';
 import { Copy } from 'lucide-react';
-
-const products = [
-  {
-    id: '1',
-    name: 'Product 1',
-    sku: 'P001',
-    quantity: 5,
-    threshold: 10,
-    lastUpdated: '2025-05-10',
-    image: '/path/to/image.jpg',
-  },
-  {
-    id: '2',
-    name: 'Product 2',
-    sku: 'P002',
-    quantity: 3,
-    threshold: 5,
-    lastUpdated: '2025-05-11',
-    image: '/path/to/image.jpg',
-  },
-];
+import { Link } from 'react-router-dom';
+import useItemStore from '../../store/useItemStore';
 
 const Items = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedProduct, setSelectedProduct] = useState(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [deleteProductId, setDeleteProductId] = useState(null);
+  const [deleteItemId, setDeleteItemId] = useState(null);
 
-  const filteredProducts = products.filter(
-    (product) =>
-      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.sku.toLowerCase().includes(searchTerm.toLowerCase())
+  const { items, fetchItems, loading } = useItemStore();
+
+  useEffect(() => {
+    fetchItems();
+  }, []);
+
+  const filteredItems = items.filter(
+    (item) =>
+      item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.id.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const openDeleteDialog = (productId) => {
-    setDeleteProductId(productId);
+  const openDeleteDialog = (itemId) => {
+    setDeleteItemId(itemId);
     setIsDeleteDialogOpen(true);
   };
 
   const closeDeleteDialog = () => {
     setIsDeleteDialogOpen(false);
-    setDeleteProductId(null);
+    setDeleteItemId(null);
   };
 
-  const deleteProduct = () => {
-    console.log('Deleted product with ID:', deleteProductId);
+  const deleteItem = () => {
+    console.log('Deleted item with ID:', deleteItemId);
     closeDeleteDialog();
+  };
+
+  const copyItemLink = (itemId) => {
+    const url = `${window.location.origin}/items/${itemId}`;
+    navigator.clipboard.writeText(url);
   };
 
   const Badge = ({ quantity, threshold }) => {
@@ -71,7 +59,7 @@ const Items = () => {
       <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
         <div>
           <h1 className='text-3xl font-bold text-[#ff851b]'>Inventory</h1>
-          <p className='text-gray-400'>Manage and track product inventory</p>
+          <p className='text-gray-400'>Manage and track item inventory</p>
         </div>
         <Link to={'/items/new'}>
           <button className='inline-flex items-center bg-[#ff851b] text-white px-4 py-2 rounded hover:bg-[#ff571d]'>
@@ -85,7 +73,7 @@ const Items = () => {
         <div className='relative flex-1'>
           <input
             type='search'
-            placeholder='Search products...'
+            placeholder='Search items...'
             className='pl-8 pr-4 py-2 border rounded w-full bg-[#2d2d2d] text-white placeholder:text-gray-400'
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -99,7 +87,7 @@ const Items = () => {
             <tr>
               <th className='text-center p-4'>Image</th>
               <th className='text-center p-4'>Name</th>
-              <th className='text-center p-4'>SKU</th>
+              <th className='text-center p-4'>Item ID</th>
               <th className='text-center p-4'>Quantity</th>
               <th className='text-center p-4'>Status</th>
               <th className='text-center p-4'>Last Updated</th>
@@ -107,45 +95,48 @@ const Items = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredProducts.length > 0 ? (
-              filteredProducts.map((product) => (
+            {loading ? (
+              <tr>
+                <td colSpan='7' className='text-center py-4 text-gray-400'>
+                  Loading items...
+                </td>
+              </tr>
+            ) : filteredItems.length > 0 ? (
+              filteredItems.map((item) => (
                 <tr
-                  key={product.id}
+                  key={item.id}
                   className='text-center border-t border-[#ff851b]/30'
                 >
                   <td className='p-4'>
                     <img
-                      src={
-                        product.image === '/path/to/image.jpg'
-                          ? 'https://img.freepik.com/premium-vector/isometric-cardboard-icon-cartoon-package-box-vector-illustration_175838-2453.jpg'
-                          : product.image
-                      }
-                      alt={product.name}
+                      src={item.image}
+                      alt={item.name}
                       className='w-10 h-10 rounded-full border border-gray-600 mx-auto'
                     />
                   </td>
-                  <td className='p-4 font-medium'>{product.name}</td>
-                  <td className='p-4'>{product.sku}</td>
-                  <td className='p-4'>{product.quantity}</td>
+                  <td className='p-4 font-medium'>{item.name}</td>
+                  <td className='p-4'>{item.id}</td>
+                  <td className='p-4'>{item.quantity}</td>
                   <td className='p-4'>
                     <Badge
-                      quantity={product.quantity}
-                      threshold={product.threshold}
+                      quantity={item.quantity}
+                      threshold={item.threshold}
                     />
                   </td>
-                  <td className='p-4'>{product.lastUpdated}</td>
+                  <td className='p-4'>
+                    {new Date(item.updatedAt).toLocaleDateString()}
+                  </td>
                   <td className='p-4 space-x-2 flex justify-evenly items-center'>
                     <Link
-                      to={`/items/${product.id}`}
+                      to={`/items/${item.id}`}
                       className='text-[#ff851b] underline text-sm'
                     >
                       Details
                     </Link>
-
                     <button
-                      onClick={() => copyOrderLink(product.id)}
+                      onClick={() => copyItemLink(item.id)}
                       className='inline-flex items-center gap-1 text-gray-400 text-sm hover:underline'
-                      title='Copy order link'
+                      title='Copy item link'
                     >
                       <Copy className='w-4 h-4' />
                     </button>
@@ -155,7 +146,7 @@ const Items = () => {
             ) : (
               <tr>
                 <td colSpan='7' className='p-4 text-center text-gray-400'>
-                  No products found.
+                  No items found.
                 </td>
               </tr>
             )}
@@ -171,7 +162,7 @@ const Items = () => {
             </h2>
             <p className='mt-2 text-sm text-gray-600'>
               This action cannot be undone. This will permanently delete the
-              product.
+              item.
             </p>
             <div className='mt-4 flex justify-end'>
               <button
@@ -182,7 +173,7 @@ const Items = () => {
               </button>
               <button
                 className='px-4 py-2 bg-red-500 text-white rounded-md'
-                onClick={deleteProduct}
+                onClick={deleteItem}
               >
                 Delete
               </button>

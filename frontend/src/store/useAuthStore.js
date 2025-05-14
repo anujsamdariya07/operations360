@@ -32,7 +32,6 @@ const useAuthStore = create((set) => ({
         username,
         password,
       });
-      console.log('HERE')
 
       const { token, employee, organization, message } = response.data;
 
@@ -105,7 +104,6 @@ const useAuthStore = create((set) => ({
 
   logout: async () => {
     try {
-      console.log('logout')
       await axiosInstance.post('/auth/logout');
       set({
         token: null,

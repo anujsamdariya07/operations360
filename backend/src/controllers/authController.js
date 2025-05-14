@@ -49,14 +49,14 @@ const signUp = async (req, res) => {
       return res.status(400).json({ message: 'Invalid Organization Data!' });
     }
 
-    let username = email.split('@')[0];
-    let existingEmployee = await Employee.findOne({ username });
+    // let username = email.split('@')[0];
+    // let existingEmployee = await Employee.findOne({ username });
 
-    while (existingEmployee) {
-      const randomNum = Math.floor(1000 + Math.random() * 9000);
-      username = `${email.split('@')[0]}${randomNum}`;
-      existingEmployee = await Employee.findOne({ username });
-    }
+    // while (existingEmployee) {
+    //   const randomNum = Math.floor(1000 + Math.random() * 9000);
+    //   username = `${email.split('@')[0]}${randomNum}`;
+    //   existingEmployee = await Employee.findOne({ username });
+    // }
 
     const employeeId = await generateEmployeeId(newOrganization._id.toString());
 
@@ -64,7 +64,7 @@ const signUp = async (req, res) => {
       orgId: newOrganization._id.toString(),
       id: employeeId,
       name,
-      username,
+      username: 'admin',
       password: hashedPassword,
       mustChangePassword: false,
       role: 'admin',

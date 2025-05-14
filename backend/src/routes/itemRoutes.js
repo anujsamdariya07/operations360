@@ -30,7 +30,6 @@ router.post(
   '/items',
   isAuthenticated,
   authorizeRoles('admin', 'manager'),
-  validate(itemSchema),
   createItem
 );
 
@@ -38,7 +37,6 @@ router.put(
   '/items/:id',
   isAuthenticated,
   authorizeRoles('admin', 'manager'),
-  validate(itemUpdateSchema),
   updateItem
 );
 
