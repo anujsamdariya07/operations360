@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
+  ArrowLeft,
   ChevronDown,
   ChevronUp,
   LoaderCircle,
@@ -85,32 +86,41 @@ const ItemPage = () => {
   return (
     <div className='p-6 max-w-3xl mx-auto bg-[#2b2b2b] rounded-xl shadow-md text-white'>
       <div className='flex justify-between items-center mb-4'>
-        <h1 className='text-3xl font-bold text-[#ff851b]'>{item.name}</h1>
-        <div className='flex space-x-3'>
-          <button
-            className='btn btn-sm btn-outline border-orange-500 text-orange-400 hover:bg-orange-500 hover:text-white flex items-center'
-            onClick={() => {
-              setItemForUpdate({
-                quantity: item.quantity,
-                threshold: item.threshold,
-                vendor: item.vendorName || '',
-                lastUpdated: currentDate,
-              });
-              setIsOpen(true);
-            }}
-          >
-            <Pencil className='w-4 h-4 mr-1' />
-            Edit
-          </button>
+  <div className='flex items-center gap-2'>
+    <button
+      className='btn btn-sm border border-[#ff851b] text-[#ff851b] hover:bg-[#ff851b] hover:text-white'
+      onClick={() => navigate('/items')}
+    >
+      <ArrowLeft className='w-4 h-4' />
+    </button>
+    <h1 className='text-3xl font-bold text-[#ff851b]'>{item.name}</h1>
+  </div>
+  <div className='flex space-x-3'>
+    <button
+      className='btn btn-sm btn-outline border-orange-500 text-orange-400 hover:bg-orange-500 hover:text-white flex items-center'
+      onClick={() => {
+        setItemForUpdate({
+          quantity: item.quantity,
+          threshold: item.threshold,
+          vendor: item.vendorName || '',
+          lastUpdated: currentDate,
+        });
+        setIsOpen(true);
+      }}
+    >
+      <Pencil className='w-4 h-4 mr-1' />
+      Edit
+    </button>
 
-          <button
-            className='btn btn-sm hover:btn-outline hover:border-red-500 hover:text-red-400 hover:bg-[#222222] bg-red-600 text-white flex items-center'
-            onClick={() => setShowDeleteConfirm(true)}
-          >
-            <Trash className='w-4 h-4 mr-1' /> Delete
-          </button>
-        </div>
-      </div>
+    <button
+      className='btn btn-sm hover:btn-outline hover:border-red-500 hover:text-red-400 hover:bg-[#222222] bg-red-600 text-white flex items-center'
+      onClick={() => setShowDeleteConfirm(true)}
+    >
+      <Trash className='w-4 h-4 mr-1' /> Delete
+    </button>
+  </div>
+</div>
+
 
       <div className='flex flex-col md:flex-row gap-6 items-start'>
         {item.image && (

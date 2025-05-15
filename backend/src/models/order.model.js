@@ -4,8 +4,7 @@ const { Schema, model, models } = mongoose;
 const orderItemSchema = new Schema(
   {
     item: {
-      type: Schema.Types.ObjectId,
-      ref: 'Item',
+      type: String,
       required: true,
     },
     quantity: {
@@ -22,19 +21,21 @@ const orderItemSchema = new Schema(
 
 const orderSchema = new Schema(
   {
+    id: {
+      type: String,
+      required: true,
+    },
     orgId: {
-      type: Schema.Types.ObjectId,
-      ref: 'Organization',
+      type: String,
       required: true,
     },
     customerId: {
-      type: Schema.Types.ObjectId,
-      ref: 'Customer',
+      type: String,
       required: true,
     },
     employeeId: {
-      type: Schema.Types.ObjectId,
-      ref: 'Employee', 
+      type: String,
+      required: true,
     },
     items: {
       type: [orderItemSchema],

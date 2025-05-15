@@ -4,8 +4,7 @@ const { Schema, model, models } = mongoose;
 const customerSchema = new Schema(
   {
     organization: {
-      type: Schema.Types.ObjectId,
-      ref: 'Organization',
+      type: String,
       required: true,
     },
     name: {
@@ -22,16 +21,7 @@ const customerSchema = new Schema(
     address: {
       type: String,
     },
-    employeeDetails: {
-      type: [Schema.Types.ObjectId],
-      ref: 'Employee',
-      default: [],
-    },
-    items: {
-      type: [Schema.Types.ObjectId],
-      ref: 'Product',
-      default: [],
-    },
+    // TODO:- orders: [] -- To be added afterwards
   },
   {
     timestamps: true,

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Copy,
   Filter,
@@ -10,97 +10,31 @@ import {
   Funnel,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import useOrderStore from '../../store/useOrderStore';
 
 const Orders = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState('current');
 
-  const currentOrders = [
-    {
-      id: 'ORD-7892',
-      customer: 'Acme Corp',
-      status: 'Processing',
-      deadline: '2025-04-25',
-      total: '₹1,200.00',
-    },
-    {
-      id: 'ORD-7891',
-      customer: 'TechGiant Inc',
-      status: 'Ready',
-      deadline: '2025-04-22',
-      total: '₹3,450.00',
-    },
-    {
-      id: 'ORD-7890',
-      customer: 'Global Supplies',
-      status: 'In Production',
-      deadline: '2025-04-30',
-      total: '₹890.50',
-    },
-    {
-      id: 'ORD-7889',
-      customer: 'Local Manufacturing',
-      status: 'Shipped',
-      deadline: '2025-04-20',
-      total: '₹2,100.00',
-    },
-    {
-      id: 'ORD-7888',
-      customer: 'City Builders',
-      status: 'Processing',
-      deadline: '2025-05-05',
-      total: '₹4,500.00',
-    },
-  ];
+  const { orders, loading, fetchOrders } = useOrderStore();
 
-  const previousOrders = [
-    {
-      id: 'ORD-7850',
-      customer: 'Acme Corp',
-      status: 'Completed',
-      completed: '2025-04-10',
-      total: '₹2,300.00',
-    },
-    {
-      id: 'ORD-7842',
-      customer: 'TechGiant Inc',
-      status: 'Completed',
-      completed: '2025-04-05',
-      total: '₹1,750.00',
-    },
-    {
-      id: 'ORD-7835',
-      customer: 'Global Supplies',
-      status: 'Completed',
-      completed: '2025-03-28',
-      total: '₹3,290.50',
-    },
-    {
-      id: 'ORD-7830',
-      customer: 'Local Manufacturing',
-      status: 'Completed',
-      completed: '2025-03-22',
-      total: '₹1,800.00',
-    },
-    {
-      id: 'ORD-7825',
-      customer: 'City Builders',
-      status: 'Completed',
-      completed: '2025-03-15',
-      total: '₹5,200.00',
-    },
-  ];
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  const currentOrders = orders.filter((order) => order.status !== 'Completed');
+  const previousOrders = orders.filter((order) => order.status === 'Completed');
 
   const filteredCurrentOrders = currentOrders.filter(
     (order) =>
-      order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.customer.toLowerCase().includes(searchTerm.toLowerCase())
+      order._id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.organizationName?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const filteredPreviousOrders = previousOrders.filter(
     (order) =>
-      order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.customer.toLowerCase().includes(searchTerm.toLowerCase())
+      order._id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.organizationName?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const copyOrderLink = (orderId) => {
@@ -111,11 +45,11 @@ const Orders = () => {
 
   const Badge = ({ status }) => {
     const colors = {
-      Processing: 'bg-yellow-500 text-white-800 font-semibold',
-      Ready: 'bg-blue-500 text-white-800 font-semibold',
-      'In Production': 'bg-indigo-500 text-white-800 font-semibold',
-      Shipped: 'bg-green-500 text-white-800 font-semibold',
-      Completed: 'bg-green-500 text-white-800 font-semibold',
+      Processing: 'bg-yellow-500 text-white font-semibold',
+      Ready: 'bg-blue-500 text-white font-semibold',
+      'In Production': 'bg-indigo-500 text-white font-semibold',
+      Shipped: 'bg-green-500 text-white font-semibold',
+      Completed: 'bg-green-500 text-white font-semibold',
     };
     return (
       <span
@@ -134,10 +68,11 @@ const Orders = () => {
         <thead className='border-b'>
           <tr>
             <th className='text-left p-4'>Order ID</th>
-            <th className='text-left p-4'>Customer</th>
+            <th className='text-left p-4'>Organization</th>
+            <th className='text-left p-4'>Created By</th>
             <th className='text-left p-4'>Status</th>
             <th className='text-left p-4'>
-              {isCurrent ? 'Deadline' : 'Completed'}
+              {isCurrent ? 'Deadline' : 'Completed At'}
             </th>
             <th className='text-left p-4'>Total</th>
             <th className='text-left p-4'>Actions</th>
@@ -146,9 +81,10 @@ const Orders = () => {
         <tbody>
           {orders.length > 0 ? (
             orders.map((order) => (
-              <tr key={order.id} className='border-t border-[#ff851b]/30'>
-                <td className='p-4 font-medium'>{order.id}</td>
-                <td className='p-4'>{order.customer}</td>
+              <tr key={order._id} className='border-t border-[#ff851b]/30'>
+                <td className='p-4 font-medium'>{order._id}</td>
+                <td className='p-4'>{order.organizationName || '-'}</td>
+                <td className='p-4'>{order.employeeName || '-'}</td>
                 <td className='p-4'>
                   <Badge status={order.status} />
                 </td>
@@ -158,12 +94,18 @@ const Orders = () => {
                   ) : (
                     <Clock className='w-4 h-4' />
                   )}
-                  {isCurrent ? order.deadline : order.completed}
+                  {isCurrent
+                    ? order.deadline
+                      ? new Date(order.deadline).toLocaleDateString()
+                      : '-'
+                    : order.completedAt
+                    ? new Date(order.completedAt).toLocaleDateString()
+                    : '-'}
                 </td>
-                <td className='p-4'>{order.total}</td>
+                <td className='p-4'>₹{order.total?.toFixed(2) || '0.00'}</td>
                 <td className='p-4 space-x-2'>
                   <Link
-                    to={`/orders/${order.id}`}
+                    to={`/orders/${order._id}`}
                     className='text-[#ff851b] underline text-sm'
                   >
                     Details
@@ -177,7 +119,7 @@ const Orders = () => {
                     </Link>
                   )}
                   <button
-                    onClick={() => copyOrderLink(order.id)}
+                    onClick={() => copyOrderLink(order._id)}
                     className='inline-flex items-center gap-1 text-gray-400 text-sm hover:underline'
                     title='Copy order link'
                   >
@@ -188,7 +130,7 @@ const Orders = () => {
             ))
           ) : (
             <tr>
-              <td colSpan='6' className='text-center text-gray-500 py-4'>
+              <td colSpan='7' className='text-center text-gray-500 py-4'>
                 No orders found matching your search.
               </td>
             </tr>
@@ -200,99 +142,64 @@ const Orders = () => {
 
   return (
     <div className='space-y-6'>
-      <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
-        <div>
-          <h1 className='text-3xl font-bold text-[#ff851b]'>Orders</h1>
-          <p className='text-gray-400'>Manage and track customer orders</p>
-        </div>
+      <div className='flex justify-between items-center'>
+        <h2 className='text-xl font-semibold text-white'>Orders</h2>
         <Link
-          to={'/orders/new'}
-          className='inline-flex items-center bg-[#ff851b] text-white px-4 py-2 rounded hover:bg-[#ff571d]'
+          to='/orders/new'
+          className='btn btn-sm bg-[#ff851b] text-white hover:bg-[#e67613]'
         >
-          <Plus className='w-4 h-4 mr-2' />
+          <Plus className='w-4 h-4 mr-1' />
           New Order
         </Link>
       </div>
 
-      <div className='flex flex-col md:flex-row gap-4'>
-        <div className='relative flex-1'>
-          <Search className='absolute left-2 top-2.5 w-4 h-4 text-gray-400' />
+      <div className='flex items-center gap-2'>
+        <div className='relative w-full'>
           <input
-            type='search'
+            type='text'
             placeholder='Search orders...'
-            className='pl-8 pr-4 py-2 border rounded w-full bg-[#2d2d2d] text-white'
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
+            className='input input-bordered w-full pl-10 bg-[#1e1e1e] text-white border-[#ff851b]/30'
           />
+          <Search className='absolute top-1/2 left-3 transform -translate-y-1/2 w-4 h-4 text-gray-400' />
         </div>
-        <button className='px-4 py-2 border border-[#ff851b] text-[#ff851b] rounded-md font-medium transition duration-200 hover:bg-[#ff851b] hover:text-white shadow-md flex gap-1 justify-between items-center'>
-          <Funnel className='w-4 h-4' />
-        </button>
-        <button
-          onClick={() => copyOrderLink(filteredCurrentOrders[0]?.id || '')}
-          className='px-4 py-2 border border-[#ff851b] text-[#ff851b] rounded-md font-medium transition duration-200 hover:bg-[#ff851b] hover:text-white shadow-md flex gap-1 justify-between items-center'
-          title='Copy current page URL'
-        >
-          <Copy className='w-4 h-4' />
+        <button className='btn btn-outline border-[#ff851b]/30 text-white hover:bg-[#ff851b]/20'>
+          <Filter className='w-4 h-4 mr-1' />
+          Filter
         </button>
       </div>
 
-      <div>
-        <div className='flex border-b border-[#ff851b]/30'>
-          <button
-            className={`px-4 py-2 text-sm text-[#ff851b] ${
-              activeTab === 'current'
-                ? 'border-b-2 border-[#ff851b] font-semibold'
-                : ''
-            }`}
-            onClick={() => setActiveTab('current')}
-          >
-            Current Orders
-          </button>
-          <button
-            className={`px-4 py-2 text-sm text-[#ff851b] ${
-              activeTab === 'previous'
-                ? 'border-b-2 border-[#ff851b] font-semibold'
-                : ''
-            }`}
-            onClick={() => setActiveTab('previous')}
-          >
-            Previous Orders
-          </button>
-        </div>
-        <div className='pt-4 space-y-4'>
-          {activeTab === 'current' ? (
-            <>
-              <div className='flex items-center justify-between'>
-                <h2 className='text-xl font-semibold text-[#ff851b]'>
-                  Current Orders
-                </h2>
-                <button className='px-4 py-2 border border-[#ff851b] text-[#ff851b] rounded-md font-medium transition duration-200 hover:bg-[#ff851b] hover:text-white shadow-md flex gap-1 justify-between items-center'>
-                  <ArrowUpDown
-                    className='w-4 h-4 mr-1
-'
-                  />
-                  Sort
-                </button>
-              </div>
-              {renderOrdersTable(filteredCurrentOrders)}
-            </>
-          ) : (
-            <>
-              <div className='flex items-center justify-between'>
-                <h2 className='text-xl font-semibold text-[#ff851b]'>
-                  Previous Orders
-                </h2>
-                <button className='text-sm border rounded px-3 py-1 flex items-center text-[#ff851b]'>
-                  <ArrowUpDown className='w-4 h-4 mr-1' />
-                  Sort
-                </button>
-              </div>
-              {renderOrdersTable(filteredPreviousOrders, false)}
-            </>
-          )}
-        </div>
+      <div className='flex gap-4 border-b border-[#ff851b]/20'>
+        <button
+          className={`px-4 py-2 text-sm font-medium ${
+            activeTab === 'current'
+              ? 'border-b-2 border-[#ff851b] text-white'
+              : 'text-gray-400'
+          }`}
+          onClick={() => setActiveTab('current')}
+        >
+          Current Orders
+        </button>
+        <button
+          className={`px-4 py-2 text-sm font-medium ${
+            activeTab === 'previous'
+              ? 'border-b-2 border-[#ff851b] text-white'
+              : 'text-gray-400'
+          }`}
+          onClick={() => setActiveTab('previous')}
+        >
+          Previous Orders
+        </button>
       </div>
+
+      {loading ? (
+        <div className='text-center text-white py-10'>Loading orders...</div>
+      ) : activeTab === 'current' ? (
+        renderOrdersTable(filteredCurrentOrders, true)
+      ) : (
+        renderOrdersTable(filteredPreviousOrders, false)
+      )}
     </div>
   );
 };
