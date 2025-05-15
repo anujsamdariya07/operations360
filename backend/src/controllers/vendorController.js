@@ -58,31 +58,26 @@ const getVendorsByOrgId = async (req, res) => {
 
 const getVendorById = async (req, res) => {
   try {
-    console.log('server-1')
     const orgId = req.user.orgId; 
-    console.log('server-2')
     const { id } = req.params;
-    console.log('server-3')
     
     if (!orgId || !id) {
-      console.log('server-4')
       return res.status(400).json({
         message: 'Missing required parameters: orgId or vendor id.',
       });
     }
     
-    console.log('server-5')
     const vendor = await Vendor.findOne({ orgId, id });
     
-    console.log('server-6')
+// console.log(server-6')
     if (!vendor) {
-      console.log('server-7')
+  // console.log(server-7')
       return res.status(404).json({
         message: 'Vendor not found within your organization.',
       });
     }
     
-    console.log('server-8')
+// console.log(server-8')
     return res.status(200).json({
       message: 'Vendor fetched successfully!',
       vendor,

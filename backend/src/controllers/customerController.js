@@ -83,33 +83,32 @@ const getAllCustomersByOrgId = async (req, res) => {
 
 // READ ONE
 const getCustomerById = async (req, res) => {
-  console.log('server-1')
+  // console.log(('server-1')
   try {
-    console.log('server-2')
+    // console.log(('server-2')
     const orgId = req.user.orgId;
-    console.log('server-3')
-    console.log('orgId', orgId)
+    // console.log(('server-3')
+    // console.log(('orgId', orgId)
     const { id } = req.params;
-    console.log('server-4')
-    console.log('id', id)
+    // console.log(('server-4')
+    // console.log(('id', id)
     
     if (!orgId || !id) {
       return res.status(400).json({
         error: 'Missing required parameters: orgId or customer id.',
       });
-      console.log('server-5')
+      // console.log((('server-5')
     }
     
     const customer = await Customer.findOne({ orgId, id });
-    console.log('server-6')
+    // console.log((('server-6')
     
     if (!customer) {
-      console.log('server-7')
+      // console.log((('server-7')
       return res.status(404).json({
         error: 'Customer not found within your organization.',
       });
     }
-    console.log('server-8')
 
     return res.status(200).json({
       message: 'Customer fetched successfully!',

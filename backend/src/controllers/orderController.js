@@ -2,35 +2,35 @@ const Order = require('../models/order.model');
 const generateOrderId = require('../utils/generateOrderId');
 
 const createOrder = async (req, res) => {
-  console.log('server-1')
+  console.log('server-1');
   try {
-    console.log('server-2')
+    // console.log(-2')
     const { orgId, employeeId } = req.user;
-    console.log('req.user', req.user)
-    console.log('orgId',orgId)
-    console.log('employeeId',employeeId)
-    console.log('server-3')
-    
+    // console.log('req.user', req.user)
+    // console.log('orgId',orgId)
+    // console.log('employeeId',employeeId)
+    // console.log(-3')
+
     if (!orgId || !employeeId) {
-      console.log('server-4')
+      // console.log(-4')
       return res.status(400).json({
         message: 'User authentication failed. Missing orgId or employeeId.',
       });
     }
-    
-    console.log('server-5')
+
+    // console.log(-5')
     const { customerId, items, notes } = req.body;
-    console.log(req.body, {customerId, items, notes})
-    console.log('server-6')
-    
+    // console.log(req.body, {customerId, items, notes})
+    // console.log(-6')
+
     if (!customerId || !items || items.length === 0) {
-      console.log('server-7')
+      // console.log(-7')
       return res
-      .status(400)
-      .json({ message: 'Missing required fields: customerId or items.' });
+        .status(400)
+        .json({ message: 'Missing required fields: customerId or items.' });
     }
-    
-    console.log('server-8')
+
+    // console.log(-8')
     const totalAmount = items.reduce((total, item) => {
       if (!item.item || !item.quantity || !item.priceAtOrder) {
         throw new Error(
@@ -44,20 +44,20 @@ const createOrder = async (req, res) => {
       }
       return total + item.quantity * item.priceAtOrder;
     }, 0);
-    console.log('server-9')
-    
+    // console.log(-9')
+
     if (totalAmount <= 0) {
-      console.log('server-10')
+      // console.log(-10')
       return res.status(400).json({
         message:
-        'Total amount cannot be zero or negative. Please check item prices or quantities.',
+          'Total amount cannot be zero or negative. Please check item prices or quantities.',
       });
     }
-    
-    console.log('server-11')
+
+    // console.log(-11')
     const orderId = await generateOrderId(orgId);
-    console.log('server-12')
-    
+    // console.log(-12')
+
     const order = new Order({
       id: orderId,
       orgId,
@@ -69,10 +69,10 @@ const createOrder = async (req, res) => {
       orderDate: new Date(),
       notes,
     });
-    console.log('server-13')
-    
+    // console.log(-13')
+
     await order.save();
-    console.log('server-14')
+    // console.log(-14')
 
     return res
       .status(201)
