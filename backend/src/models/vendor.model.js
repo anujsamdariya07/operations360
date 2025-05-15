@@ -7,6 +7,10 @@ const vendorSchema = new Schema(
       type: String,
       required: true,
     },
+    id: {
+      type: String,
+      required: true,
+    },
     name: {
       type: String,
       required: true,
@@ -22,7 +26,11 @@ const vendorSchema = new Schema(
       type: String,
       required: true,
     },
-    gst: {
+    status: {
+      type: String,
+      default: 'active',
+    },
+    gstNo: {
       type: String,
       required: true,
       uppercase: true,

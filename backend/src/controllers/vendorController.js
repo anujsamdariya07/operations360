@@ -1,11 +1,13 @@
 const Vendor = require('../models/vendor.model');
+const generateVendorId = require('../utils/generateVendorId');
 
 const createVendor = async (req, res) => {
   try {
-    const { name, email, phone, gst, address } = req.body;
-    const { orgId } = req.user.orgId;
+    const { name, email, phone, gstNo, address, status } = req.body;
+    const orgId = req.user.orgId;
 
-    if (!name || !email || !phone || !gst || !address) {
+    if (!name || !email || !phone || !gstNo || !address) {
+      console.log(req.body)
       return res.status(400).json({ message: 'All fields are required.' });
     }
 
@@ -14,17 +16,21 @@ const createVendor = async (req, res) => {
       return res.status(409).json({ message: 'Email already exists.' });
     }
 
-    const existingGST = await Vendor.findOne({ gst });
+    const existingGST = await Vendor.findOne({ gstNo });
     if (existingGST) {
       return res.status(409).json({ message: 'GST number already exists.' });
     }
 
+    const id = await generateVendorId(orgId)
+
     const vendor = await Vendor.create({
       orgId,
+      id,
       name,
       email,
       phone,
-      gst,
+      gstNo,
+      status: 'active',
       address,
     });
     res.status(201).json({ message: 'Vendor Successfully Created!', vendor });
@@ -36,7 +42,7 @@ const createVendor = async (req, res) => {
 
 const getVendorsByOrgId = async (req, res) => {
   try {
-    const { orgId } = req.user.id;
+    const orgId = req.user.orgId;
 
     if (!orgId) {
       return res.status(400).json({ message: 'orgId is required.' });
@@ -50,7 +56,49 @@ const getVendorsByOrgId = async (req, res) => {
   }
 };
 
+const getVendorById = async (req, res) => {
+  try {
+    console.log('server-1')
+    const orgId = req.user.orgId; 
+    console.log('server-2')
+    const { id } = req.params;
+    console.log('server-3')
+    
+    if (!orgId || !id) {
+      console.log('server-4')
+      return res.status(400).json({
+        message: 'Missing required parameters: orgId or vendor id.',
+      });
+    }
+    
+    console.log('server-5')
+    const vendor = await Vendor.findOne({ orgId, id });
+    
+    console.log('server-6')
+    if (!vendor) {
+      console.log('server-7')
+      return res.status(404).json({
+        message: 'Vendor not found within your organization.',
+      });
+    }
+    
+    console.log('server-8')
+    return res.status(200).json({
+      message: 'Vendor fetched successfully!',
+      vendor,
+    });
+  } catch (error) {
+    console.error('Error fetching vendor by id:', error);
+    return res.status(500).json({
+      message: 'Server error.',
+      error: error.message,
+    });
+  }
+};
+
+
 module.exports = {
   createVendor,
   getVendorsByOrgId,
+  getVendorById
 };

@@ -3,14 +3,10 @@ const router = express.Router();
 const {
   createVendor,
   getVendorsByOrgId,
+  getVendorById
 } = require('../controllers/vendorController');
 const isAuthenticated = require('../middlewares/isAuthenticated');
 const authorizeRoles = require('../middlewares/authorizeRoles');
-const {
-  vendorSchema,
-  vendorUpdateSchema,
-} = require('../validators/vendorValidator');
-const validate = require('../middlewares/validator');
 
 router.get(
   '/vendors',
@@ -19,11 +15,17 @@ router.get(
   getVendorsByOrgId
 );
 
+router.get(
+  '/vendors/:id',
+  isAuthenticated,
+  authorizeRoles('admin', 'manager', 'employee'),
+  getVendorById
+);
+
 router.post(
   '/vendors',
   isAuthenticated,
   authorizeRoles('admin'),
-  validate(vendorUpdateSchema),
   createVendor
 );
 
