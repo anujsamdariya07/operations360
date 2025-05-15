@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -9,41 +9,36 @@ import {
   Phone,
   User,
 } from 'lucide-react';
-
-const customerData = {
-  1: {
-    id: 1,
-    name: 'Acme Corp',
-    email: 'contact@acmecorp.com',
-    phone: '+91 9876543210',
-    location: 'New York, NY',
-    orders: 12,
-    status: 'Active',
-    address: '123 Business Ave, NY',
-    gstNo: 'GSTIN1234567890',
-    pendingOrders: [
-      {
-        id: 'ORD001',
-        name: 'Bulk Cement',
-        status: 'Processing',
-        deadline: '2025-05-20',
-        total: '$3,200',
-      },
-      {
-        id: 'ORD002',
-        name: 'Rebar Steel',
-        status: 'Out for Delivery',
-        deadline: '2025-05-25',
-        total: '$7,800',
-      },
-    ],
-  },
-};
+import useCustomerStore from '../../store/useCustomerStore';
 
 const CustomerPage = () => {
   const { customerId } = useParams();
   const navigate = useNavigate();
-  const customer = customerData[customerId];
+  const {
+    selectedCustomer: customer,
+    fetchCustomerById,
+    loading,
+  } = useCustomerStore();
+
+  useEffect(() => {
+    if (customerId) {
+      fetchCustomerById(customerId);
+    }
+  }, [customerId, fetchCustomerById]);
+
+  const copyCustomerLink = (id) => {
+    const url = `${window.location.origin}/customers/${id}`;
+    navigator.clipboard.writeText(url);
+    alert(`Link copied: ${url}`);
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#2d2d2d] text-white flex justify-center items-center">
+        <p className="text-lg text-gray-400">Loading customer details...</p>
+      </div>
+    );
+  }
 
   if (!customer) {
     return (
@@ -63,12 +58,6 @@ const CustomerPage = () => {
     );
   }
 
-  const copyCustomerLink = (id) => {
-    const url = `${window.location.origin}/customers/${id}`;
-    navigator.clipboard.writeText(url);
-    alert(`Link copied: ${url}`);
-  };
-
   return (
     <div className="min-h-screen bg-[#2d2d2d] text-white p-4 space-y-6">
       <div className="flex justify-between items-center">
@@ -81,7 +70,9 @@ const CustomerPage = () => {
           </button>
           <div>
             <h1 className="text-2xl font-bold text-[#ff851b]">{customer.name}</h1>
-            <p className="text-sm text-[#a0a0a0]">Customer ID: {customer.id}</p>
+            <p className="text-sm text-[#a0a0a0]">Customer ID: {customer.id}
+              {console.log(customer)}
+            </p>
           </div>
         </div>
         <div className="flex gap-2">
@@ -93,8 +84,8 @@ const CustomerPage = () => {
             Copy Link
           </button>
           <button
-            
             className="btn btn-sm bg-[#ff851b] text-white hover:bg-orange-500"
+            onClick={() => navigate(`/customers/edit/${customer.id}`)}
           >
             Edit Customer
           </button>
@@ -107,18 +98,18 @@ const CustomerPage = () => {
             <div className="badge border border-[#ff851b] text-[#ff851b] bg-transparent">
               {customer.status}
             </div>
-            <p className="text-sm text-[#a0a0a0]">Total Orders: {customer.orders}</p>
+            <p className="text-sm text-[#a0a0a0]">Total Orders: {customer.orders?.length ?? 0}</p>
           </div>
         </Card>
 
         <Card title="GST Number">
-          <p className="text-lg">{customer.gstNo}</p>
+          <p className="text-lg">{customer.gstNo || 'N/A'}</p>
         </Card>
 
         <Card title="Location">
           <div className="flex items-center gap-2">
             <MapPin className="w-5 h-5 text-[#a0a0a0]" />
-            <span>{customer.location}</span>
+            <span>{customer.address || 'N/A'}</span>
           </div>
         </Card>
       </div>
@@ -135,8 +126,8 @@ const CustomerPage = () => {
           </Card>
 
           <Card title="Business Details">
-            <Row label="GST Number" value={customer.gstNo} />
-            <Row label="Total Orders" value={customer.orders} />
+            <Row label="GST Number" value={customer.gstNo || 'N/A'} />
+            <Row label="Total Orders" value={customer.orders?.length ?? 0} />
             <Row
               label="Status"
               value={
@@ -150,7 +141,7 @@ const CustomerPage = () => {
 
         <div className="md:col-span-2">
           <Card title="Pending Orders" subtitle="Orders that are not yet delivered">
-            {customer.pendingOrders.length ? (
+            {customer.pendingOrders?.length ? (
               <div className="overflow-x-auto">
                 <table className="table w-full text-sm">
                   <thead className="text-white bg-[#1e1e1e]">
@@ -169,9 +160,7 @@ const CustomerPage = () => {
                         <td>{order.id}</td>
                         <td>{order.name}</td>
                         <td>
-                          <span
-                            className={`badge ${getStatusBadge(order.status)}`}
-                          >
+                          <span className={`badge ${getStatusBadge(order.status)}`}>
                             {order.status}
                           </span>
                         </td>
@@ -183,9 +172,7 @@ const CustomerPage = () => {
                         <td>
                           <button
                             className="btn btn-sm border border-white text-white"
-                            onClick={() =>
-                              navigate(`/dashboard/orders/${order.id}`)
-                            }
+                            onClick={() => navigate(`/dashboard/orders/${order.id}`)}
                           >
                             View
                           </button>
@@ -207,6 +194,7 @@ const CustomerPage = () => {
   );
 };
 
+// Reusable components
 const Card = ({ title, subtitle, children }) => (
   <div className="bg-[#1e1e1e] p-4 rounded-xl shadow border border-gray-700">
     <h2 className="text-lg font-semibold text-[#ff851b]">{title}</h2>
@@ -242,6 +230,8 @@ function getStatusBadge(status) {
       return 'border border-blue-400 text-blue-400 bg-transparent';
     case 'Under Process':
       return 'border border-purple-400 text-purple-400 bg-transparent';
+    case 'Delivered':
+      return 'border border-green-400 text-green-400 bg-transparent';
     default:
       return 'border border-gray-400 text-gray-400 bg-transparent';
   }

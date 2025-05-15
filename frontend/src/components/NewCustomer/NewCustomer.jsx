@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import useCustomerStore from '../../store/useCustomerStore';
+import {LoaderCircle} from 'lucide-react'
 
 const NewCustomer = () => {
   const navigate = useNavigate();
+  const { createCustomer, loading } = useCustomerStore();
 
   const [customerForm, setCustomerForm] = useState({
     name: '',
@@ -29,7 +32,7 @@ const NewCustomer = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!customerForm.name || !customerForm.phone) {
@@ -37,13 +40,10 @@ const NewCustomer = () => {
       return;
     }
 
-    console.log('Customer created:', {
-      id: Math.floor(Math.random() * 1000),
-      ...customerForm,
-      orders: 0,
-    });
-
-    navigate('/dashboard/customers');
+    const success = await createCustomer(customerForm);
+    if (success) {
+      navigate('/customers');
+    }
   };
 
   return (
@@ -170,16 +170,13 @@ const NewCustomer = () => {
               <label htmlFor='status' className='block text-sm font-medium'>
                 Status
               </label>
-              <select
+              <input
                 id='status'
                 name='status'
-                value={customerForm.status}
-                onChange={(e) => handleSelectChange('status', e.target.value)}
+                defaultValue={'active'}
                 className='select select-bordered w-full bg-[#3a3a3a] text-white border-gray-600'
-              >
-                <option value='active'>Active</option>
-                <option value='inactive'>Inactive</option>
-              </select>
+                readOnly
+              />
             </div>
           </div>
         </div>
@@ -189,15 +186,18 @@ const NewCustomer = () => {
           <button
             type='button'
             className='px-4 py-2 rounded border border-gray-600 text-gray-300 hover:bg-[#444]'
-            onClick={() => navigate('/dashboard/customers')}
+            onClick={() => navigate('/customers')}
           >
             Cancel
           </button>
           <button
             type='submit'
             className='inline-flex items-center bg-[#ff851b] text-white px-4 py-2 rounded hover:bg-[#ff571d]'
+            disabled={loading}
           >
-            Save Customer
+            {loading? (
+              <LoaderCircle className='animate-spin'/>
+            ):'Save Customer'}
           </button>
         </div>
       </form>

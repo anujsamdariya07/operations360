@@ -2,16 +2,43 @@ const express = require('express');
 const router = express.Router();
 const {
   createCustomer,
-  getAllCustomers,
+  getAllCustomersByOrgId,
   getCustomerById,
   updateCustomer,
   deleteCustomer,
 } = require('../controllers/customerController');
+const isAuthenticated = require('../middlewares/isAuthenticated');
+const authorizeRoles = require('../middlewares/authorizeRoles');
 
-router.post('/', createCustomer);
-router.get('/', getAllCustomers);
-router.get('/:id', getCustomerById);
-router.put('/:id', updateCustomer);
-router.delete('/:id', deleteCustomer);
+router.post(
+  '/customers',
+  isAuthenticated,
+  authorizeRoles('admin', 'manager'),
+  createCustomer
+);
+router.get(
+  '/customers',
+  isAuthenticated,
+  authorizeRoles('admin', 'manager', 'employee'),
+  getAllCustomersByOrgId
+);
+router.get(
+  '/customers/:id',
+  isAuthenticated,
+  authorizeRoles('admin', 'manager', 'employee'),
+  getCustomerById
+);
+router.put(
+  '/customers/:id',
+  isAuthenticated,
+  authorizeRoles('admin', 'manager'),
+  updateCustomer
+);
+router.delete(
+  '/customers/:id',
+  isAuthenticated,
+  authorizeRoles('admin', 'manager'),
+  deleteCustomer
+);
 
 module.exports = router;

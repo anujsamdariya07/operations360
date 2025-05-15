@@ -1,40 +1,137 @@
 const Customer = require('../models/customer.model');
+const generateCustomerId = require('../utils/generateCustomerId'); // Adjust path as needed
 
-// CREATE
-exports.createCustomer = async (req, res) => {
+const createCustomer = async (req, res) => {
   try {
-    const customer = await Customer.create(req.body);
-    res.status(201).json(customer);
+    const orgId = req.user.orgId;
+    const { name, phone, email, address, gstNo } = req.body;
+
+    if (!orgId || !name || !phone || !email || !address) {
+      return res.status(400).json({
+        error:
+          'Missing required fields: orgId, name, phone, email, or address.',
+      });
+    }
+
+    const existingCustomer = await Customer.findOne({
+      orgId,
+      $or: [{ email }, { gstNo }],
+    });
+
+    if (existingCustomer) {
+      return res.status(409).json({
+        error: 'Customer with the same email or GST number already exists.',
+      });
+    }
+
+    const customerId = await generateCustomerId(orgId);
+
+    const customer = new Customer({
+      id: customerId,
+      orgId,
+      name,
+      phone,
+      email,
+      address,
+      gstNo,
+      status: 'active',
+      orders: [],
+    });
+
+    await customer.save();
+
+    return res.status(201).json({
+      message: 'Customer created successfully!',
+      customer,
+    });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    console.error('Error creating customer:', err);
+    return res.status(500).json({
+      error:
+        err.message ||
+        'An unexpected error occurred while creating the customer.',
+    });
   }
 };
 
 // READ ALL
-exports.getAllCustomers = async (req, res) => {
+const getAllCustomersByOrgId = async (req, res) => {
   try {
-    const customers = await Customer.find();
-    res.status(200).json(customers);
+    const orgId = req.user.orgId;
+
+    if (!orgId) {
+      return res.status(403).json({
+        error: 'Unauthorized. Organization ID missing.',
+      });
+    }
+
+    const customers = await Customer.find({ orgId });
+
+    return res.status(200).json({
+      message: 'Customers fetched successfully!',
+      customers,
+    });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Error fetching customers by orgId:', err);
+    return res.status(500).json({
+      error:
+        err.message ||
+        'An unexpected error occurred while fetching customers.',
+    });
   }
 };
 
 // READ ONE
-exports.getCustomerById = async (req, res) => {
+const getCustomerById = async (req, res) => {
+  console.log('server-1')
   try {
-    const customer = await Customer.findById(req.params.id);
-    if (!customer) return res.status(404).json({ error: 'Customer not found' });
-    res.status(200).json(customer);
+    console.log('server-2')
+    const orgId = req.user.orgId;
+    console.log('server-3')
+    console.log('orgId', orgId)
+    const { id } = req.params;
+    console.log('server-4')
+    console.log('id', id)
+    
+    if (!orgId || !id) {
+      return res.status(400).json({
+        error: 'Missing required parameters: orgId or customer id.',
+      });
+      console.log('server-5')
+    }
+    
+    const customer = await Customer.findOne({ orgId, id });
+    console.log('server-6')
+    
+    if (!customer) {
+      console.log('server-7')
+      return res.status(404).json({
+        error: 'Customer not found within your organization.',
+      });
+    }
+    console.log('server-8')
+
+    return res.status(200).json({
+      message: 'Customer fetched successfully!',
+      customer,
+    });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Error fetching customer by ID:', err);
+    return res.status(500).json({
+      error:
+        err.message ||
+        'An unexpected error occurred while fetching the customer.',
+    });
   }
 };
 
+
 // UPDATE
-exports.updateCustomer = async (req, res) => {
+const updateCustomer = async (req, res) => {
   try {
-    const updated = await Customer.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const updated = await Customer.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+    });
     res.status(200).json(updated);
   } catch (err) {
     res.status(400).json({ error: err.message });
@@ -42,11 +139,19 @@ exports.updateCustomer = async (req, res) => {
 };
 
 // DELETE
-exports.deleteCustomer = async (req, res) => {
+const deleteCustomer = async (req, res) => {
   try {
     await Customer.findByIdAndDelete(req.params.id);
     res.status(200).json({ message: 'Customer deleted' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+};
+
+module.exports = {
+  createCustomer,
+  getAllCustomersByOrgId,
+  getCustomerById,
+  updateCustomer,
+  deleteCustomer,
 };
